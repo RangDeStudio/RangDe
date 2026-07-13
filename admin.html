@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RangDe Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:"Nunito",sans-serif;background:#fff8f0;color:#2c1810;min-height:100vh;}
+#loginScreen{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px;}
+.login-card{background:#fff;border-radius:24px;padding:48px 40px;box-shadow:0 8px 40px rgba(202,48,39,.15);max-width:420px;width:100%;text-align:center;border:2px solid rgba(202,48,39,.1);}
+.login-logo{font-family:"Dancing Script",cursive;font-size:3rem;color:#ca3027;margin-bottom:4px;}
+.login-sub{font-size:.8rem;letter-spacing:3px;text-transform:uppercase;color:#7a4a3a;margin-bottom:32px;}
+.lbl{display:block;text-align:left;font-size:.75rem;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:#7a4a3a;margin-bottom:6px;margin-top:14px;}
+.login-card input{width:100%;padding:14px 16px;border:2px solid rgba(202,48,39,.2);border-radius:14px;font-family:"Nunito",sans-serif;font-size:1rem;color:#2c1810;background:#fffaf5;outline:none;}
+.login-card input:focus{border-color:#ca3027;}
+.login-btn{width:100%;padding:14px;background:linear-gradient(135deg,#ca3027,#a82620);color:#fff;border:none;border-radius:50px;font-family:"Nunito",sans-serif;font-weight:800;font-size:1rem;cursor:pointer;margin-top:20px;}
+.login-err{color:#a82620;font-size:.85rem;margin-top:10px;display:none;padding:8px;background:#ffe0de;border-radius:8px;}
+.url-note{font-size:.75rem;color:#7a4a3a;margin-top:16px;line-height:1.6;text-align:left;background:#fff3e0;padding:12px;border-radius:10px;}
+#adminPanel{display:none;}
+.topbar{background:linear-gradient(135deg,#ca3027,#a82620);color:#fff;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.topbar-logo{font-family:"Dancing Script",cursive;font-size:1.6rem;}
+.topbar-right{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+.refresh-btn{background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.4);color:#fff;padding:7px 16px;border-radius:50px;font-family:"Nunito",sans-serif;font-weight:700;font-size:.8rem;cursor:pointer;}
+.logout-btn{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.3);color:#fff;padding:7px 16px;border-radius:50px;font-family:"Nunito",sans-serif;font-weight:700;font-size:.8rem;cursor:pointer;}
+.stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;padding:20px;}
+.stat-card{background:#fff;border-radius:16px;padding:18px;text-align:center;box-shadow:0 2px 12px rgba(202,48,39,.08);border:1.5px solid rgba(202,48,39,.08);}
+.stat-num{font-size:2rem;font-weight:800;color:#ca3027;line-height:1;}
+.stat-label{font-size:.68rem;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:#7a4a3a;margin-top:4px;}
+.toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:0 20px 14px;}
+.search-input{flex:1;min-width:180px;padding:10px 16px;border:2px solid rgba(202,48,39,.15);border-radius:50px;font-family:"Nunito",sans-serif;font-size:.9rem;outline:none;}
+.search-input:focus{border-color:#ca3027;}
+.filter-select{padding:10px 14px;border:2px solid rgba(202,48,39,.15);border-radius:50px;font-family:"Nunito",sans-serif;font-size:.85rem;background:#fff;outline:none;cursor:pointer;}
+.dl-btn{padding:10px 20px;background:linear-gradient(135deg,#ca3027,#a82620);color:#fff;border:none;border-radius:50px;font-family:"Nunito",sans-serif;font-weight:700;font-size:.85rem;cursor:pointer;}
+.table-wrap{padding:0 20px 40px;overflow-x:auto;}
+table{width:100%;border-collapse:collapse;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 2px 16px rgba(202,48,39,.08);}
+thead tr{background:linear-gradient(135deg,#ca3027,#a82620);color:#fff;}
+th{padding:13px 14px;font-size:.68rem;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;text-align:left;white-space:nowrap;}
+td{padding:12px 14px;font-size:.85rem;border-bottom:1px solid rgba(202,48,39,.07);vertical-align:top;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:rgba(253,190,109,.07);}
+.badge{display:inline-block;padding:3px 10px;border-radius:50px;font-size:.7rem;font-weight:800;}
+.badge-ind{background:#fff3e0;color:#e8a040;}
+.badge-grp{background:#ffe0de;color:#a82620;}
+.badge-free{background:#e8f8e8;color:#1e7e34;}
+.badge-paid{background:#e8f0ff;color:#3a4ab8;}
+.no-data{text-align:center;padding:50px;color:#7a4a3a;}
+.loading{text-align:center;padding:50px;color:#7a4a3a;font-style:italic;}
+.source-badge{font-size:.72rem;padding:4px 12px;border-radius:50px;font-weight:700;}
+.src-sheet{background:#e8f8e8;color:#1e7e34;}
+.src-local{background:#fff3e0;color:#e8a040;}
+@media(max-width:600px){
+  .login-card{padding:28px 18px;}
+  .stats-row,.toolbar{padding:12px;}
+  .table-wrap{padding:0 10px 24px;}
+  th,td{padding:9px 10px;font-size:.78rem;}
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginScreen">
+  <div class="login-card">
+    <div class="login-logo">RangDe</div>
+    <div class="login-sub">Admin Panel</div>
+    <label class="lbl">Email</label>
+    <input type="email" id="adminEmail" placeholder="admin@rangde.com">
+    <label class="lbl">Password</label>
+    <input type="password" id="adminPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="login-btn" onclick="doLogin()">Login →</button>
+    <div class="login-err" id="loginErr">Incorrect email or password.</div>
+    <div class="url-note">
+      <strong>First time?</strong> Paste your Google Apps Script URL in <code>admin.html</code> (SHEET_URL variable) to load live cloud data. Otherwise local data is shown.
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN PANEL -->
+<div id="adminPanel">
+  <div class="topbar">
+    <div class="topbar-logo">RangDe Admin ✦</div>
+    <div class="topbar-right">
+      <span id="dataSource"></span>
+      <span id="lastRefresh" style="font-size:.75rem;opacity:.8;"></span>
+      <button class="refresh-btn" onclick="loadData()">↻ Refresh</button>
+      <button class="logout-btn" onclick="doLogout()">Logout</button>
+    </div>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-card"><div class="stat-num" id="statTotal">—</div><div class="stat-label">Registrations</div></div>
+    <div class="stat-card"><div class="stat-num" id="statPeople">—</div><div class="stat-label">Total People</div></div>
+    <div class="stat-card"><div class="stat-num" id="statRevenue">—</div><div class="stat-label">Revenue (Rs.)</div></div>
+    <div class="stat-card"><div class="stat-num" id="statFree">—</div><div class="stat-label">Free Passes</div></div>
+    <div class="stat-card"><div class="stat-num" id="statGroup">—</div><div class="stat-label">Groups</div></div>
+  </div>
+
+  <div class="toolbar">
+    <input type="text" class="search-input" id="searchInput" placeholder="Search name, email, phone..." oninput="renderTable()">
+    <select class="filter-select" id="filterType" onchange="renderTable()">
+      <option value="">All Types</option>
+      <option value="Individual">Individual</option>
+      <option value="Group">Group</option>
+    </select>
+    <select class="filter-select" id="filterCoupon" onchange="renderTable()">
+      <option value="">All Coupons</option>
+      <option value="-">No Coupon</option>
+      <option value="MUN27">MUN27 (Free)</option>
+      <option value="FRIENDS10">FRIENDS10</option>
+      <option value="BLOGGERS25">BLOGGERS25</option>
+      <option value="BLOGGER50">BLOGGER50</option>
+      <option value="BUSH25">BUSH25</option>
+      <option value="FRIEND50">FRIEND50</option>
+    </select>
+    <button class="dl-btn" onclick="downloadCSV()">⬇ Export CSV</button>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th><th>Date</th><th>Name</th><th>Email</th><th>Phone</th>
+          <th>Type</th><th>People</th><th>Member Names</th><th>Member Phones</th>
+          <th>Coupon</th><th>Discount</th><th>Total Paid</th>
+          <th>Payment</th><th>Txn ID</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody"><tr><td colspan="13" class="loading">Loading...</td></tr></tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+// ── CONFIG — paste your Google Apps Script URL here ────────────────
+const SHEET_URL   = 'https://script.google.com/macros/s/AKfycbyipzbwnwkGgpp7xoyFkGuaX0l23BkZ8JpfmsJn7pNOFSb8qxdVF8v96uc50mjgif07/exec';
+const ADMIN_EMAIL = 'admin@rangde.com';
+const ADMIN_PASS  = 'rangde2025';
+const CSV_KEY     = 'rangde_registrations';
+
+// ── LOGIN ──────────────────────────────────────────────────────────
+function doLogin() {
+  const e = document.getElementById('adminEmail').value.trim();
+  const p = document.getElementById('adminPass').value;
+  if (e === ADMIN_EMAIL && p === ADMIN_PASS) {
+    sessionStorage.setItem('rd_admin', '1');
+    showPanel();
+  } else {
+    document.getElementById('loginErr').style.display = 'block';
+    document.getElementById('adminPass').value = '';
+  }
+}
+
+function doLogout() {
+  sessionStorage.removeItem('rd_admin');
+  document.getElementById('adminPanel').style.display = 'none';
+  document.getElementById('loginScreen').style.display = 'flex';
+}
+
+function showPanel() {
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('adminPanel').style.display = 'block';
+  loadData();
+  setInterval(loadData, 30000);
+}
+
+// ── LOAD DATA — Google Sheet first, fallback to localStorage ───────
+let allRecords = [];
+
+async function loadData() {
+  document.getElementById('tableBody').innerHTML =
+    '<tr><td colspan="13" class="loading">Loading data...</td></tr>';
+
+  // Try Google Sheet first
+  if (SHEET_URL && SHEET_URL !== 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE') {
+    try {
+      const url = SHEET_URL + '?u=' + encodeURIComponent(ADMIN_EMAIL)
+                            + '&p=' + encodeURIComponent(ADMIN_PASS);
+      const res  = await fetch(url);
+      const json = await res.json();
+      if (json.status === 'ok') {
+        allRecords = json.rows || [];
+        setSource('Google Sheets ✓', 'src-sheet');
+        updateStats();
+        renderTable();
+        setRefreshTime();
+        return;
+      }
+    } catch(e) { /* fall through to localStorage */ }
+  }
+
+  // Fallback: localStorage
+  try { allRecords = JSON.parse(localStorage.getItem(CSV_KEY) || '[]'); }
+  catch(e) { allRecords = []; }
+  setSource('Local Storage', 'src-local');
+  updateStats();
+  renderTable();
+  setRefreshTime();
+}
+
+function setSource(label, cls) {
+  document.getElementById('dataSource').innerHTML =
+    `<span class="source-badge ${cls}">${label}</span>`;
+}
+
+function setRefreshTime() {
+  document.getElementById('lastRefresh').textContent =
+    new Date().toLocaleTimeString('en-PK');
+}
+
+// ── STATS ──────────────────────────────────────────────────────────
+function updateStats() {
+  const total   = allRecords.length;
+  const people  = allRecords.reduce((s,r) => s + (parseInt(r.Members)||1), 0);
+  const revenue = allRecords.reduce((s,r) => {
+    const v = String(r.TotalPaid||'').replace(/[^0-9]/g,'');
+    return s + (parseInt(v)||0);
+  }, 0);
+  const free  = allRecords.filter(r => String(r.TotalPaid).toUpperCase().includes('FREE')).length;
+  const group = allRecords.filter(r => r.Type === 'Group').length;
+
+  document.getElementById('statTotal').textContent   = total;
+  document.getElementById('statPeople').textContent  = people;
+  document.getElementById('statRevenue').textContent = revenue.toLocaleString('en-PK');
+  document.getElementById('statFree').textContent    = free;
+  document.getElementById('statGroup').textContent   = group;
+}
+
+// ── TABLE ──────────────────────────────────────────────────────────
+function renderTable() {
+  const q     = document.getElementById('searchInput').value.toLowerCase();
+  const fType = document.getElementById('filterType').value;
+  const fCoup = document.getElementById('filterCoupon').value;
+
+  const rows = allRecords.filter(r => {
+    const matchQ = !q ||
+      String(r.Name||'').toLowerCase().includes(q) ||
+      String(r.Email||'').toLowerCase().includes(q) ||
+      String(r.Phone||'').toLowerCase().includes(q);
+    const matchT = !fType || r.Type === fType;
+    const matchC = !fCoup ||
+      (fCoup === '-' && (!r.CouponUsed || r.CouponUsed === '-')) ||
+      r.CouponUsed === fCoup;
+    return matchQ && matchT && matchC;
+  });
+
+  const tbody = document.getElementById('tableBody');
+  if (!rows.length) {
+    tbody.innerHTML = '<tr><td colspan="13" class="no-data">No registrations found.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = rows.map((r, i) => `
+    <tr>
+      <td>${i+1}</td>
+      <td style="white-space:nowrap;font-size:.78rem">${r.Date||'-'}</td>
+      <td><strong>${r.Name||'-'}</strong></td>
+      <td style="font-size:.82rem">${r.Email||'-'}</td>
+      <td>${r.Phone||'-'}</td>
+      <td><span class="badge ${r.Type==='Group'?'badge-grp':'badge-ind'}">${r.Type||'-'}</span></td>
+      <td style="text-align:center;font-weight:800">${r.Members||1}</td>
+      <td style="font-size:.78rem;color:#7a4a3a;max-width:140px">${r.GroupMemberNames||'-'}</td>
+      <td style="font-size:.78rem;color:#7a4a3a;max-width:140px">${r.GroupMemNumB||'-'}</td>
+      <td><strong style="color:#ca3027">${r.CouponUsed||'-'}</strong></td>
+      <td style="font-weight:700">${r.Discount||'0%'}</td>
+      <td><span class="badge ${String(r.TotalPaid).toUpperCase().includes('FREE')?'badge-free':'badge-paid'}">${r.TotalPaid||'-'}</span></td>
+      <td style="font-size:.82rem">${r.PaymentMethod||'-'}</td>
+      <td style="font-size:.78rem">${r.TransactionID||'-'}</td>
+    </tr>`).join('');
+}
+
+// ── CSV EXPORT ─────────────────────────────────────────────────────
+function downloadCSV() {
+  if (!allRecords.length) { alert('No data to export.'); return; }
+  const headers = ['Date','Name','Email','Phone','Type','Members',
+                   'GroupMemberNames','GroupMemNumB','CouponUsed','Discount',
+                   'TotalPaid','PaymentMethod','TransactionID'];
+  const csv = [
+    headers.join(','),
+    ...allRecords.map(r =>
+      headers.map(h => '"' + String(r[h]||'').replace(/"/g,'""') + '"').join(',')
+    )
+  ].join('\n');
+  const a = Object.assign(document.createElement('a'), {
+    href: URL.createObjectURL(new Blob([csv], {type:'text/csv'})),
+    download: 'RangDe_' + new Date().toISOString().slice(0,10) + '.csv'
+  });
+  a.click();
+}
+
+if (sessionStorage.getItem('rd_admin') === '1') showPanel();
+</script>
+</body>
+</html>

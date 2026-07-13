@@ -1,0 +1,345 @@
+﻿import os
+
+# ─────────────────────────────────────────
+# FULL index.html — RangDe theme
+# Red #ca3027  |  Amber #fdbe6d  |  Warm white #fffaf5
+# ─────────────────────────────────────────
+
+imgs = [
+  '0f431b090d7461ac9f14f73eb6b042a6.jpg',
+  '1f78180c4dc30bf0b73f764d0c48bc16.jpg',
+  '26d5f1d99181dee25dbd782a8bf2812d.jpg',
+  '2ee5dd1f9260a92ebabde6f3b26897ad.jpg',
+  '3e2ddefa63450393d8fa03566a95db64.jpg',
+  '41cef61b7b12f07860688f75c345c0f1.jpg',
+  '60557fd2605addaadd35792b68f58ed4.jpg',
+  '60f47360df720ba960f3bd2f0cfdc52f.jpg',
+  '639fdcd91a4edef186c91ed72ea8a11c.jpg',
+  '65a4e8ee73d4ecf8ecf7959d5e1aebc7.jpg',
+  '851dea950f9f4e2060c9963bfdc9c0d8.jpg',
+  'a54fe8cdc4fcc7951dceb6dce7540c9c.jpg',
+  'bcbd47765c103cf73a7d70cc55365f9b.jpg',
+  'c45687b757c2ba9e75d30a9fc87873d8.jpg',
+  'f32fc805f6e7e2ae184bebb8829accd3.jpg',
+]
+
+slides = '\n'.join(
+  f'      <div class="slide"><img src="{i}" alt="Workshop" loading="lazy"><div class="slide-overlay"></div></div>'
+  for i in imgs
+)
+
+HTML = f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RangDe Art Studio &#8212; Workshop Registration</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav" id="top">
+  <div class="nav-inner">
+    <div class="nav-brand">
+      <img src="1.png" alt="RangDe logo" class="nav-logo-img">
+      <span class="nav-logo">RangDe</span>
+    </div>
+    <div class="nav-links">
+      <a href="#event">Workshop</a>
+      <a href="#coming-soon">Coming Soon</a>
+      <a href="#reviews">Reviews</a>
+      <a href="#register" class="nav-cta">Register Now</a>
+    </div>
+    <button class="hamburger" id="hamburger" aria-label="Menu">&#9776;</button>
+  </div>
+  <div class="nav-mobile" id="navMobile">
+    <a href="#event">Workshop</a>
+    <a href="#coming-soon">Coming Soon</a>
+    <a href="#reviews">Reviews</a>
+    <a href="#register">Register Now</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="hero">
+  <div class="carousel-wrap">
+    <div class="carousel-track" id="track">
+{slides}
+    </div>
+    <button class="c-btn c-prev" id="prev" aria-label="Previous">&#8249;</button>
+    <button class="c-btn c-next" id="next" aria-label="Next">&#8250;</button>
+    <div class="c-dots" id="dots"></div>
+  </div>
+  <div class="hero-overlay">
+    <div class="hero-badge">&#10022; Peshawar&#39;s Art Studio &#10022;</div>
+    <h1>RangDe</h1>
+    <p class="hero-sub">Paint &nbsp;&#8226;&nbsp; Create &nbsp;&#8226;&nbsp; Relax</p>
+    <a href="#register" class="btn btn-hero">&#127912; Register Now</a>
+  </div>
+</section>
+
+<!-- EVENT -->
+<section class="section event-sec" id="event">
+  <div class="container">
+    <div class="sec-label">Current Event</div>
+    <h2 class="sec-title">Canvas Painting + Trinket Tray Workshop</h2>
+    <div class="washi"></div>
+    <div class="event-card">
+      <div class="event-grid">
+        <div class="eblock"><span class="eicon">&#128205;</span><div><div class="elabel">Location</div><div class="eval">Peshawar</div></div></div>
+        <div class="eblock"><span class="eicon">&#128197;</span><div><div class="elabel">Date &amp; Time</div><div class="eval">TBA &#8212; Check Instagram</div></div></div>
+        <div class="eblock"><span class="eicon">&#128176;</span><div><div class="elabel">Price</div><div class="eval price-val">Rs. 1,800 / person</div></div></div>
+        <div class="eblock"><span class="eicon">&#8987;</span><div><div class="elabel">Duration</div><div class="eval">~3 Hours</div></div></div>
+      </div>
+      <p class="event-desc">A cozy afternoon of guided painting and crafting &#8212; no experience needed! You&#39;ll paint your own canvas AND decorate a trinket tray to take home. All materials provided.</p>
+      <div class="incl">
+        <h3 class="incl-title">&#10024; What&#39;s Included</h3>
+        <ul class="incl-list">
+          <li><span>&#128396;</span> All paints &amp; painting materials</li>
+          <li><span>&#128444;</span> Canvas board (yours to keep)</li>
+          <li><span>&#129695;</span> Trinket tray to paint &amp; decorate</li>
+          <li><span>&#127800;</span> Guided step-by-step instructor session</li>
+          <li><span>&#9749;</span> Light refreshments</li>
+          <li><span>&#128247;</span> Photo ops &amp; studio setup</li>
+          <li><span>&#128140;</span> 10% off the upcoming Tote Bag workshop</li>
+        </ul>
+      </div>
+      <a href="#register" class="btn btn-primary">Reserve My Spot &#127912;</a>
+    </div>
+    <div class="gallery">
+      <div class="gi gi-lg"><img src="60557fd2605addaadd35792b68f58ed4.jpg" alt="Workshop"><span class="gs" style="top:12px;right:14px">&#127912;</span></div>
+      <div class="gi"><img src="65a4e8ee73d4ecf8ecf7959d5e1aebc7.jpg" alt="Workshop"></div>
+      <div class="gi"><img src="851dea950f9f4e2060c9963bfdc9c0d8.jpg" alt="Workshop"></div>
+      <div class="gi gi-tall"><img src="a54fe8cdc4fcc7951dceb6dce7540c9c.jpg" alt="Workshop"></div>
+      <div class="gi"><img src="bcbd47765c103cf73a7d70cc55365f9b.jpg" alt="Workshop"></div>
+      <div class="gi"><img src="c45687b757c2ba9e75d30a9fc87873d8.jpg" alt="Workshop"></div>
+    </div>
+  </div>
+</section>
+
+<!-- COMING SOON -->
+<section class="section soon-sec" id="coming-soon">
+  <div class="container">
+    <div class="sec-label">Next Up</div>
+    <h2 class="sec-title">Coming Soon &#10024;</h2>
+    <div class="washi"></div>
+    <div class="soon-card">
+      <div class="soon-ribbon">Coming Soon</div>
+      <div class="soon-icons">&#128084; &#129695;</div>
+      <h3 class="soon-title">Tote Bag Painting<br>+ Air-Dry Clay Mirror Art</h3>
+      <p class="soon-desc">Our most-requested workshop is almost here! Paint your own tote bag AND create a stunning air-dry clay mirror frame to hang at home.</p>
+      <div class="soon-highlight">
+        <span>&#127881;</span>
+        <p>Register for the <strong>Canvas &amp; Trinket Tray Workshop</strong> now and get <strong>10% off</strong> this upcoming event automatically!</p>
+      </div>
+      <div class="soon-actions">
+        <a href="https://wa.me/923000000000?text=Notify%20me%20for%20Tote%20Bag%20Workshop" target="_blank" class="btn btn-outline">&#128172; Notify Me on WhatsApp</a>
+        <a href="https://instagram.com/rangdeartstudio" target="_blank" class="btn btn-ghost">&#128248; Follow on Instagram</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- REVIEWS -->
+<section class="section reviews-sec" id="reviews">
+  <div class="container">
+    <div class="sec-label">Kind Words</div>
+    <h2 class="sec-title">What Attendees Say &#128149;</h2>
+    <div class="washi"></div>
+    <div class="reviews-row">
+      <div class="rev-card polaroid">
+        <div class="rev-img"><img src="f32fc805f6e7e2ae184bebb8829accd3.jpg" alt="Attendee"></div>
+        <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <p>&#34;Absolutely loved every second! The vibe was so cozy and my trinket tray turned out better than expected &#129393;&#34;</p>
+        <span class="rev-name">&#8212; Hira A.</span>
+      </div>
+      <div class="rev-card sticky orange">
+        <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <p>&#34;Best girls&#39; day out in Peshawar! We came as a group of 4 and everyone had such a great time. Will definitely be back!&#34;</p>
+        <span class="rev-name">&#8212; Manal &amp; friends</span>
+      </div>
+      <div class="rev-card polaroid">
+        <div class="rev-img"><img src="639fdcd91a4edef186c91ed72ea8a11c.jpg" alt="Attendee"></div>
+        <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <p>&#34;I&#39;d never painted before but the whole session was so chill and fun! So proud of my canvas &#127912;&#34;</p>
+        <span class="rev-name">&#8212; Zara K.</span>
+      </div>
+      <div class="rev-card sticky red">
+        <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <p>&#34;The Rs. 1800 price is SO worth it &#8212; paints, canvas, tray, refreshments all included. 10/10 recommend!&#34;</p>
+        <span class="rev-name">&#8212; Urooj M.</span>
+      </div>
+      <div class="rev-card polaroid">
+        <div class="rev-img"><img src="2ee5dd1f9260a92ebabde6f3b26897ad.jpg" alt="Attendee"></div>
+        <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <p>&#34;Such a cute setup, perfect for photos! Everyone&#39;s asking where I went &#128514;&#10024;&#34;</p>
+        <span class="rev-name">&#8212; Alishba R.</span>
+      </div>
+      <div class="rev-card sticky orange">
+        <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <p>&#34;Came solo, left with new friends and two beautiful crafts. My new favourite thing to do in Peshawar!&#34;</p>
+        <span class="rev-name">&#8212; Noor F.</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- REGISTER -->
+<section class="section reg-sec" id="register">
+  <div class="container">
+    <div class="sec-label">Save Your Spot</div>
+    <h2 class="sec-title">Register Now &#127912;</h2>
+    <div class="washi"></div>
+    <div class="steps-bar">
+      <div class="step active" id="sd1"><div class="sc">1</div><div class="sl">Info</div></div>
+      <div class="step-line"></div>
+      <div class="step" id="sd2"><div class="sc">2</div><div class="sl">Discount</div></div>
+      <div class="step-line"></div>
+      <div class="step" id="sd3"><div class="sc">3</div><div class="sl">Payment</div></div>
+      <div class="step-line"></div>
+      <div class="step" id="sd4"><div class="sc">4</div><div class="sl">Confirm</div></div>
+    </div>
+    <div class="form-card" id="formCard">
+
+      <div class="fstep active" id="step1">
+        <h3 class="fstep-title">Tell Us About You &#127775;</h3>
+        <div class="fg"><label for="fullName">Full Name *</label><input type="text" id="fullName" placeholder="Your name"></div>
+        <div class="fg"><label for="phone">Phone Number *</label><input type="tel" id="phone" placeholder="+92 3XX XXXXXXX"></div>
+        <div class="fg"><label for="email">Email Address *</label><input type="email" id="email" placeholder="hello@yourmail.com"></div>
+        <div class="fg">
+          <label>Registration Type</label>
+          <div class="toggle-group">
+            <button type="button" class="tbtn active" id="btnInd" onclick="setType('individual')">&#128100; Individual</button>
+            <button type="button" class="tbtn" id="btnGrp" onclick="setType('group')">&#128111; Group (3+ people)</button>
+          </div>
+        </div>
+        <div id="grpSection" style="display:none">
+          <div class="fg">
+            <label>Group Members</label>
+            <p class="hint">Minimum 3 people &#8212; 15% group discount applies!</p>
+            <div id="grpList">
+              <div class="gmrow"><span class="gnum">2.</span><input type="text" class="minput" placeholder="Member 2 name"></div>
+              <div class="gmrow"><span class="gnum">3.</span><input type="text" class="minput" placeholder="Member 3 name"></div>
+            </div>
+            <button type="button" class="add-member" onclick="addMember()">+ Add Another Member</button>
+          </div>
+        </div>
+        <div class="fnav"><span></span><button type="button" class="btn btn-primary" onclick="goStep(2)">Next Step &#8594;</button></div>
+      </div>
+
+      <div class="fstep" id="step2">
+        <h3 class="fstep-title">Any Discounts? &#127999;</h3>
+        <div class="price-box" id="priceBox">
+          <div class="prow"><span>Base price</span><span id="baseP">Rs. 1,800</span></div>
+          <div class="prow disc-row" id="discRow" style="display:none"><span id="discLabel">Discount</span><span id="discAmt" class="disc-green">-Rs. 0</span></div>
+          <div class="prow total-row"><span>Total</span><span id="totalP">Rs. 1,800</span></div>
+        </div>
+        <div class="fg" id="couponFg">
+          <label for="coupon">Coupon Code</label>
+          <div class="coupon-row"><input type="text" id="coupon" placeholder="Enter promo code"><button type="button" class="btn btn-sm" onclick="applyCoupon()">Apply</button></div>
+          <div class="cmsg" id="couponMsg"></div>
+        </div>
+        <div class="disc-notice" id="grpNotice" style="display:none">
+          <span>&#128111;</span><p>Group discount of <strong>15%</strong> applied automatically!</p>
+        </div>
+        <div class="fnav">
+          <button type="button" class="btn btn-ghost" onclick="goStep(1)">&#8592; Back</button>
+          <button type="button" class="btn btn-primary" onclick="goStep(3)">Next Step &#8594;</button>
+        </div>
+      </div>
+
+      <div class="fstep" id="step3">
+        <h3 class="fstep-title">Payment &#128184;</h3>
+        <div class="pay-banner"><span>Amount Due:</span><strong id="payAmt">Rs. 1,800</strong></div>
+        <div class="fg">
+          <label>Choose Payment Method</label>
+          <div class="pay-methods">
+            <label class="pay-opt">
+              <input type="radio" name="pm" value="easypaisa" onchange="selectPM('easypaisa')">
+              <div class="pay-card"><div class="pm-logo ep">EasyPaisa</div><span>EasyPaisa</span></div>
+            </label>
+            <label class="pay-opt">
+              <input type="radio" name="pm" value="jazzcash" onchange="selectPM('jazzcash')">
+              <div class="pay-card"><div class="pm-logo jc">JazzCash</div><span>JazzCash</span></div>
+            </label>
+          </div>
+        </div>
+        <div class="pay-instructions" id="payInstr" style="display:none">
+          <div class="instr-card">
+            <h4 id="pmTitle">Send payment to:</h4>
+            <div class="acc-num" id="accNum">03XX-XXXXXXX</div>
+            <p class="acc-name">Account Name: RangDe Art Studio</p>
+            <ol class="instr-list">
+              <li>Open your <span id="pmName">payment app</span></li>
+              <li>Send <strong id="sendAmt">Rs. 1,800</strong> to the number above</li>
+              <li>Take a screenshot of the confirmation</li>
+              <li>Upload the screenshot below</li>
+            </ol>
+          </div>
+        </div>
+        <div class="fg" id="txnFg" style="display:none">
+          <label for="txnId">Transaction ID *</label>
+          <input type="text" id="txnId" placeholder="e.g. TXN123456789">
+        </div>
+        <div class="fg" id="uploadFg" style="display:none">
+          <label>Upload Payment Screenshot *</label>
+          <div class="upload-area" id="uploadArea" onclick="document.getElementById('proofFile').click()">
+            <div class="upload-icon">&#128206;</div>
+            <p>Click to upload or drag &amp; drop</p>
+            <small>JPG, PNG, PDF &#8212; max 5MB</small>
+            <div id="uploadPreview"></div>
+          </div>
+          <input type="file" id="proofFile" accept="image/*,.pdf" style="display:none" onchange="handleUpload(event)">
+        </div>
+        <div class="fnav">
+          <button type="button" class="btn btn-ghost" onclick="goStep(2)">&#8592; Back</button>
+          <button type="button" class="btn btn-primary" onclick="submitReg()">Submit Registration &#127881;</button>
+        </div>
+      </div>
+
+      <div class="fstep" id="step4">
+        <div class="success">
+          <div class="confetti">&#127882;&#127912;&#127800;&#10024;</div>
+          <h3>You&#39;re In! &#127881;</h3>
+          <p>See you at the workshop! We&#39;re so excited to create with you &#128149;</p>
+          <div class="name-tag"><span>&#127991;</span><div><div class="ntl">Registered as</div><div class="ntv" id="confName">&#8212;</div></div></div>
+          <div class="succ-actions">
+            <a href="https://chat.whatsapp.com/XXXXXXXXXXXXXXXX" target="_blank" class="btn btn-primary">&#128172; Join WhatsApp Group</a>
+            <a href="https://instagram.com/rangdeartstudio" target="_blank" class="btn btn-outline">&#128248; Follow on Instagram</a>
+          </div>
+          <div class="next-tease"><p>&#127808; Your <strong>10% off</strong> the upcoming Tote Bag + Clay Mirror workshop is automatically saved!</p></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-stripe"></div>
+  <div class="footer-inner">
+    <div class="footer-logo">RangDe</div>
+    <p class="footer-tag">Paint &bull; Create &bull; Relax</p>
+    <div class="footer-links">
+      <a href="https://instagram.com/rangdeartstudio" target="_blank">&#128248; @rangdeartstudio</a>
+      <span>&middot;</span>
+      <span>&#128205; Peshawar, Pakistan</span>
+      <span>&middot;</span>
+      <a href="mailto:rangdeartstudio@gmail.com">&#9993; Collaborations</a>
+    </div>
+    <p class="footer-copy">&copy; 2025 RangDe Art Studio &middot; Made with &#10084; in Peshawar</p>
+  </div>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>"""
+
+with open("index.html","w",encoding="utf-8") as f:
+    f.write(HTML)
+print("index.html done:", len(HTML))

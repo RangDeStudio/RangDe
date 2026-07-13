@@ -1,0 +1,87 @@
+# Website Build Prompt — Rangraiz Art Studio Registration Site
+
+Use this prompt as-is with a website builder / developer / AI tool.
+
+---
+
+## PROMPT
+
+Build a single-page registration website for **Rangraiz Art Studio**, a girly, aesthetic, Pinterest-inspired arts & crafts workshop brand based in Peshawar. The site should feel soft, dreamy, and handmade — like a scrapbook mixed with a modern landing page.
+
+### 1. Overall Aesthetic
+- Color palette: blush pink, dusty rose, cream/ivory, soft white, with gold/rose-gold accents.
+- Fonts: a handwritten/script font for headings (like "Rangraiz"), paired with a clean rounded sans-serif for body text.
+- Background textures: subtle gingham/checkered pink pattern (matching the studio's highlight cover), soft paper-grain texture, or blush gradient.
+- Decorative elements scattered throughout: paint palette stickers, trinket tray stickers, tote bag stickers, washi-tape corners, small floral doodles — used as accents near headings and section breaks, not overwhelming the layout.
+- Rounded corners everywhere (cards, buttons, images) — nothing sharp or corporate.
+- Mobile-first responsive design (most visitors will come from Instagram on mobile).
+
+### 2. Hero / Moving Banner
+- A full-width auto-playing carousel at the top (moves automatically every 3–4 seconds, swipeable on mobile, with dot indicators).
+- Populated with visuals I'll provide (event posters, workshop photos, behind-the-scenes shots).
+- Overlaid text on the banner: event name, tagline ("Paint • Create • Relax"), and a "Register Now" button that scrolls to the registration/checkout section.
+
+### 3. Current Event Section — Canvas + Trinket Tray Painting Workshop
+- Section styled like a Pinterest pin board / masonry gallery showing past workshop photos and stickers as decorative overlays.
+- Event details block:
+  - Title: Canvas Painting + Trinket Tray Workshop
+  - Location: Peshawar
+  - Date & time (placeholder, editable)
+  - Price: **Rs. 1800 per person**
+  - Short description of what's included (materials, guided session, take-home pieces)
+- "What's Included" as a checklist styled with little sticker icons (paintbrush, tray, tote bag).
+
+### 4. Coming Soon Section
+- A visually distinct "Coming Soon" card/banner (slightly muted or with a "Soon" ribbon sticker) for the next event:
+  - **Tote Bag Painting + Air-Dry Clay Mirror Art Workshop**
+  - No registration open yet — just an email/WhatsApp "notify me" button.
+  - Small note: "Register for the Canvas & Trinket Tray Workshop now and get **10% off** this upcoming event automatically."
+
+### 5. Reviews Section
+- Pinterest/testimonial-card style layout (masonry or horizontal scroll) showing attendee reviews with photos, star ratings, and short quotes — styled like sticky notes or polaroids.
+
+### 6. Registration & Checkout Flow
+Build a multi-step registration form:
+
+**Step 1 — Attendee Info**
+- Name, phone number, email
+- Option toggle: **Individual** or **Group (3+ people)**
+  - If Group is selected: dynamic fields to add each group member's name (minimum 3)
+
+**Step 2 — Discount Logic**
+- Coupon code field (e.g. blogger coupon codes) → applies **10% off**
+- Group registration (3 or more people) → applies **15% off** automatically
+- **Important rule: Coupon and Group discount cannot be combined.** If a user has a group of 3+ AND tries to enter a coupon, show a message: *"Group discount and coupon code can't be used together — the better discount (15%) has been applied automatically."* Always auto-select whichever discount is valid and higher, and disable the other input once one is active.
+- Live price summary showing: base price (Rs. 1800 × number of people), discount applied, final total.
+
+**Step 3 — Payment**
+- Payment method selection: **EasyPaisa** or **JazzCash**
+- Show account/payment number and instructions (manual transfer + screenshot upload) OR integrate a payment gateway if available — specify placeholder fields for account number and transaction ID confirmation.
+- Upload field for payment screenshot/proof.
+
+**Step 4 — Confirmation**
+- After submission, show a success screen with:
+  - A button/link to join the **WhatsApp/Telegram group** (for event coordination)
+  - A button/link to follow the **Instagram/announcement channel**
+  - Confirmation message: "You're in! See you at the workshop 🎨"
+
+### 7. Footer
+- Instagram handle, location (Peshawar), contact for collaborations, small pink gingham pattern strip matching the brand's highlight cover.
+
+### 8. Technical Notes
+- All discount math should be calculated live in the frontend (no page reloads).
+- Store registration + payment proof data (form submission should go to an email, Google Sheet, or simple backend — specify based on what's available).
+- Keep it a single scrolling page with smooth-scroll navigation, not multiple separate pages.
+
+---
+
+### Discount Logic Summary (for quick reference)
+| Scenario | Discount |
+|---|---|
+| Individual, no coupon | 0% |
+| Individual + coupon | 10% |
+| Group of 3+ | 15% |
+| Group of 3+ + coupon entered | 15% only (coupon ignored, user notified) |
+| Register for current event | Auto 10% off next event (tote bag/clay mirror) |
+
+**Base price: Rs. 1800 per person**
