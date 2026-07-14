@@ -107,6 +107,9 @@ function goStep(n) {
     const total = finalTotal();
     document.getElementById('payAmt').textContent = formatRs(total);
     document.getElementById('sendAmt').textContent = formatRs(total);
+    // Auto-select JazzCash
+    const jcRadio = document.querySelector('input[value="jazzcash"]');
+    if (jcRadio && !jcRadio.checked) { jcRadio.checked = true; selectPM('jazzcash'); }
   }
 
   state.currentStep = n;
@@ -302,16 +305,9 @@ function selectPM(method) {
   instr.style.display = 'block';
   document.getElementById('txnFg').style.display = 'block';
   document.getElementById('uploadFg').style.display = 'block';
-
-  if (method === 'easypaisa') {
-    document.getElementById('pmTitle').textContent = 'Send via EasyPaisa to:';
-    document.getElementById('accNum').textContent = '03369146789';
-    document.getElementById('pmName').textContent = 'EasyPaisa';
-  } else {
-    document.getElementById('pmTitle').textContent = 'Send via JazzCash to:';
-    document.getElementById('accNum').textContent = '03369146789';
-    document.getElementById('pmName').textContent = 'JazzCash';
-  }
+  document.getElementById('pmTitle').textContent = 'Send via JazzCash to:';
+  document.getElementById('accNum').textContent = '03369146789';
+  document.getElementById('pmName').textContent = 'JazzCash';
 }
 
 // ── FILE UPLOAD ───────────────────────────────────────────────────────
@@ -401,51 +397,60 @@ function saveAndConfirm() {
     TransactionID: txn,
   };
 
-  // ── Save to Google Sheet ──────────────────────────────────────────
+  // ── Save to Google Sheet + send Telegram + upload screenshot ────
   if (SHEET_URL && !SHEET_URL.includes('YOUR_GOOGLE_APPS_SCRIPT_URL_HERE')) {
-    const formData = new URLSearchParams();
-    formData.append('data', JSON.stringify(row));
-    fetch(SHEET_URL, {
-      method: 'POST',
-      mode: 'no-cors',
-      body: formData,
-    })
-    .then(() => console.log('✅ Sent to Google Sheets'))
-    .catch(err => console.error('❌ Sheet error:', err));
 
-    // ── Upload payment screenshot to Google Drive via Apps Script ──
+    // Generate invoice ID first so we can include it in the sheet row
+    const firstInvoiceId = generateInvoiceId();
+    row.InvoiceID = firstInvoiceId;
+
+    // Send registration data to sheet via iframe (GET)
+    const params = new URLSearchParams({ data: JSON.stringify(row) });
+    const iframe = document.createElement('iframe');
+    iframe.style.display = 'none';
+    iframe.src = SHEET_URL + '?' + params.toString();
+    document.body.appendChild(iframe);
+    setTimeout(() => { try { document.body.removeChild(iframe); } catch(e){} }, 5000);
+
+    // Send payment screenshot via POST → Apps Script → Telegram + Drive
     const proofFile = document.getElementById('proofFile').files[0];
     if (proofFile) {
       const fileReader = new FileReader();
-      fileReader.onload = function(e) {
-        const base64 = e.target.result.split(',')[1];
-        const uploadData = new URLSearchParams();
-        uploadData.append('action', 'uploadFile');
-        uploadData.append('fileName', name.replace(/\s+/g,'_') + '_' + txn + '_' + Date.now() + '.' + proofFile.name.split('.').pop());
-        uploadData.append('mimeType', proofFile.type);
-        uploadData.append('base64Data', base64);
-        fetch(SHEET_URL, {
-          method: 'POST',
-          mode: 'no-cors',
-          body: uploadData,
-        })
-        .then(() => console.log('✅ Payment screenshot sent to Drive'))
-        .catch(err => console.error('❌ Drive upload error:', err));
+      fileReader.onload = function(ev) {
+        const base64 = ev.target.result.split(',')[1];
+        const fd = new FormData();
+        fd.append('action',     'uploadScreenshot');
+        fd.append('base64Data', base64);
+        fd.append('mimeType',   proofFile.type);
+        fd.append('name',       name);
+        fd.append('phone',      phone);
+        fd.append('txn',        txn);
+        fd.append('amount',     total === 0 ? 'FREE' : 'Rs. ' + total);
+        fd.append('invoiceId',  firstInvoiceId);
+        fetch(SHEET_URL, { method: 'POST', mode: 'no-cors', body: fd })
+          .then(() => console.log('✅ Screenshot sent to Telegram + Drive'))
+          .catch(err => console.error('❌ Screenshot error:', err));
       };
       fileReader.readAsDataURL(proofFile);
     }
+
+    // Render invoices with the pre-generated first invoice ID
+    const invoiceData = {
+      name, phone, email, coupon, regType, members, total,
+      method, txn, date, memberNames, memberPhones,
+      discountPct: state.discountPct,
+      firstInvoiceId,
+    };
+    renderInvoices(invoiceData);
+  } else {
+    // No sheet URL — just render invoices normally
+    const invoiceData = {
+      name, phone, email, coupon, regType, members, total,
+      method, txn, date, memberNames, memberPhones,
+      discountPct: state.discountPct,
+    };
+    renderInvoices(invoiceData);
   }
-
-  // ── Local CSV backup ──────────────────────────────────────────────
-  saveToLocalCSV(row);
-
-  // ── Generate invoices ─────────────────────────────────────────────
-  const invoiceData = {
-    name, phone, email, coupon, regType, members, total,
-    method, txn, date, memberNames, memberPhones,
-    discountPct: state.discountPct,
-  };
-  renderInvoices(invoiceData);
 
   // ── Show confirmation ─────────────────────────────────────────────
   document.getElementById('confName').textContent = name;
@@ -490,7 +495,7 @@ function renderInvoices(data) {
   wrap.appendChild(heading);
 
   attendees.forEach(function(attendee, idx) {
-    const invId = generateInvoiceId();
+    const invId = idx === 0 && data.firstInvoiceId ? data.firstInvoiceId : generateInvoiceId();
     const perPersonAmt = data.regType === 'Group'
       ? formatRs(Math.round(BASE_PRICE * (1 - data.discountPct / 100)))
       : (data.total === 0 ? '\uD83C\uDF89 FREE' : formatRs(data.total));
