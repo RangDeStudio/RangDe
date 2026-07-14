@@ -1,8 +1,9 @@
 const SHEET_NAME = 'Sheet1';
 const ADMIN_USER = 'admin@rangde.com';
 const ADMIN_PASS = 'rangde2025';
-const TG_TOKEN   = '8861959678:AAHAENh9Hx6ZZ49HHn88HuFwLsoJr1waUzM';
-const TG_CHAT_ID = '8746498717';
+// ⚠️ TG_TOKEN and TG_CHAT_ID are set directly in Code.gs only — never commit these to GitHub
+const TG_TOKEN   = 'PASTE_YOUR_BOT_TOKEN_HERE';
+const TG_CHAT_ID = 'PASTE_YOUR_CHAT_ID_HERE';
 
 // ── Telegram: send text message ───────────────────────────────────────
 function sendTelegram(message) {
