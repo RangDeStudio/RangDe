@@ -8,6 +8,7 @@ const COUPONS = {
   'BUSH25':     25,    // 25% off
   'FRIEND50':   50,    // 50% off — friends
   'RANGDE75':   75,    // 75% off
+  'ROYAAM25':   25,    // 25% off
 };
 const BASE_PRICE = 1800;
 
