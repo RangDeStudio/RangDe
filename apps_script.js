@@ -52,11 +52,11 @@ function doGet(e) {
       if (sheet.getLastRow() === 0) {
         sheet.appendRow(['Date','Name','Email','Phone','Type','Members',
                          'GroupMemberNames','GroupMemNumB','CouponUsed','Discount',
-                         'TotalPaid','PaymentMethod','TransactionID','InvoiceID']);
+                         'ReferredBy','TotalPaid','PaymentMethod','TransactionID','InvoiceID']);
       }
       var cols = ['Date','Name','Email','Phone','Type','Members',
                   'GroupMemberNames','GroupMemNumB','CouponUsed','Discount',
-                  'TotalPaid','PaymentMethod','TransactionID','InvoiceID'];
+                  'ReferredBy','TotalPaid','PaymentMethod','TransactionID','InvoiceID'];
       sheet.appendRow(cols.map(function(h){ return data[h] || ''; }));
 
       // Telegram text
@@ -79,7 +79,8 @@ function doGet(e) {
       }
 
       msg += '🏷 <b>Coupon:</b> '    + (data.CouponUsed   || '-') + '\n'
-        + '💸 <b>Discount:</b> '  + (data.Discount     || '0%')+ '\n'
+        + '� <b>Referred by:</b> '+ (data.ReferredBy   || '-') + '\n'
+        + '�💸 <b>Discount:</b> '  + (data.Discount     || '0%')+ '\n'
         + '💰 <b>Total Paid:</b> '+ (data.TotalPaid    || '-') + '\n'
         + '💳 <b>Payment:</b> '   + (data.PaymentMethod|| '-') + '\n'
         + '🔖 <b>Txn ID:</b> '    + (data.TransactionID|| '-') + '\n'

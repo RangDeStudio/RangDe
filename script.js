@@ -160,6 +160,8 @@ function setType(t) {
   state.couponCode = '';
   document.getElementById('coupon').value = '';
   clearCouponMsg();
+  document.getElementById('referredFg').style.display = 'none';
+  document.getElementById('referredBy').value = '';
 
   document.getElementById('btnInd').classList.toggle('active', t === 'individual');
   document.getElementById('btnGrp').classList.toggle('active', t === 'group');
@@ -242,10 +244,12 @@ function applyCoupon() {
       ? "🎉 100% off — it's on us! Free registration!"
       : `✅ Coupon applied! ${pct}% discount unlocked.`;
     showCouponMsg(msg, 'ok');
+    document.getElementById('referredFg').style.display = 'block';
   } else {
     state.couponApplied = false;
     state.discountPct   = 0;
     showCouponMsg('Invalid coupon code. Please try again.', 'err');
+    document.getElementById('referredFg').style.display = 'none';
   }
   updatePriceSummary();
 }
@@ -364,6 +368,7 @@ function saveAndConfirm() {
   const phone   = document.getElementById('phone').value.trim();
   const email   = document.getElementById('email').value.trim();
   const coupon  = state.couponApplied ? state.couponCode : '';
+  const referredBy = (document.getElementById('referredBy').value || '').trim();
   const regType = state.type === 'group' ? 'Group' : 'Individual';
   const members = state.members;
   const total   = finalTotal();
@@ -393,6 +398,7 @@ function saveAndConfirm() {
     GroupMemNumB:      memberPhones.join(' | ') || '-',
     CouponUsed: coupon || '-',
     Discount: state.discountPct + '%',
+    ReferredBy: referredBy || '-',
     TotalPaid: total === 0 ? 'FREE' : 'Rs. ' + total,
     PaymentMethod: method,
     TransactionID: txn,
