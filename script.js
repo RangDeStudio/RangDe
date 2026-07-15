@@ -151,6 +151,12 @@ function validateStep(n) {
     if (!txn) { alert('Please enter your Transaction ID.'); return false; }
     if (!state.fileUploaded) { alert('Please upload your payment screenshot.'); return false; }
   }
+  if (n === 2) {
+    if (state.couponApplied) {
+      const ref = document.getElementById('referredBy').value.trim();
+      if (!ref) { alert('Please enter who referred this coupon to you.'); return false; }
+    }
+  }
   return true;
 }
 
