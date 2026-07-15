@@ -7,6 +7,7 @@ const COUPONS = {
   'BLOGGER50':  50,    // 50% off — bloggers
   'BUSH25':     25,    // 25% off
   'FRIEND50':   50,    // 50% off — friends
+  'RANGDE75':   75,    // 75% off
 };
 const BASE_PRICE = 1800;
 
