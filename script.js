@@ -110,8 +110,8 @@ function goStep(n) {
     document.getElementById('payAmt').textContent = formatRs(total);
     document.getElementById('sendAmt').textContent = formatRs(total);
     // Auto-select JazzCash
-    const jcRadio = document.querySelector('input[value="jazzcash"]');
-    if (jcRadio && !jcRadio.checked) { jcRadio.checked = true; selectPM('jazzcash'); }
+    const jcRadio = document.querySelector('input[value="easypaisa"]');
+    if (jcRadio && !jcRadio.checked) { jcRadio.checked = true; selectPM('easypaisa'); }
   }
 
   state.currentStep = n;
@@ -313,13 +313,12 @@ function updatePriceSummary() {
 // ── PAYMENT METHOD ────────────────────────────────────────────────────
 function selectPM(method) {
   state.paymentMethod = method;
-  const instr = document.getElementById('payInstr');
-  instr.style.display = 'block';
+  document.getElementById('payInstr').style.display = 'block';
   document.getElementById('txnFg').style.display = 'block';
   document.getElementById('uploadFg').style.display = 'block';
-  document.getElementById('pmTitle').textContent = 'Send via JazzCash to:';
+  document.getElementById('pmTitle').textContent = 'Send via EasyPaisa to:';
   document.getElementById('accNum').textContent = '03369146789';
-  document.getElementById('pmName').textContent = 'JazzCash';
+  document.getElementById('pmName').textContent = 'EasyPaisa';
 }
 
 // ── FILE UPLOAD ───────────────────────────────────────────────────────
