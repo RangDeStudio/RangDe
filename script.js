@@ -132,16 +132,17 @@ function validateStep(n) {
     if (!phone) { alert('Please enter your phone number.'); return false; }
     if (phone.replace(/\D/g,'').length !== 11) { alert('Phone number must be exactly 11 digits.'); return false; }
     if (!email || !email.includes('@')) { alert('Please enter a valid email address.'); return false; }
-    if (state.type === 'group') {
+    if (state.type === 'group' || state.type === 'duo') {
       const rows = document.querySelectorAll('#grpList .gmrow');
-      for (const row of rows) {
+      const visibleRows = Array.from(rows).filter(r => r.style.display !== 'none');
+      for (const row of visibleRows) {
         const name  = row.querySelector('.mname');
         const phone = row.querySelector('.mphone');
         if (!name || !name.value.trim()) {
-          alert('Please fill in all group member names.'); return false;
+          alert('Please fill in all member names.'); return false;
         }
         if (!phone || phone.value.replace(/\D/g,'').length !== 11) {
-          alert('Each group member needs an 11-digit phone number.'); return false;
+          alert('Each member needs an 11-digit phone number.'); return false;
         }
       }
       updateMemberCount();
@@ -172,24 +173,57 @@ function setType(t) {
   state.couponCode = '';
   document.getElementById('coupon').value = '';
   clearCouponMsg();
-  document.getElementById('referredFg').style.display = 'none';
-  document.getElementById('referredBy').value = '';
+  if (document.getElementById('referredFg')) {
+    document.getElementById('referredFg').style.display = 'none';
+    document.getElementById('referredBy').value = '';
+  }
 
   document.getElementById('btnInd').classList.toggle('active', t === 'individual');
+  document.getElementById('btnDuo').classList.toggle('active', t === 'duo');
   document.getElementById('btnGrp').classList.toggle('active', t === 'group');
-  document.getElementById('grpSection').style.display = t === 'group' ? 'block' : 'none';
 
-  if (t === 'group') {
+  const grpSection = document.getElementById('grpSection');
+  const grpRow3    = document.getElementById('grpRow3');
+  const addBtn     = document.getElementById('addMemberBtn');
+  const grpHint    = document.getElementById('grpHint');
+
+  if (t === 'duo') {
+    state.discountPct = 25;
+    state.members = 2;
+    lockCoupon(true);
+    document.getElementById('couponFg').style.display = 'none';
+    document.getElementById('grpCouponBlock').style.display = 'flex';
+    grpSection.style.display = 'block';
+    // Show only 1 member row, hide 3rd row and add button
+    if (grpRow3) grpRow3.style.display = 'none';
+    if (addBtn)  addBtn.style.display  = 'none';
+    if (grpHint) grpHint.innerHTML = 'Enter your partner\'s details &#8212; <strong>25% duo discount</strong> applies!';
+    document.getElementById('grpCouponBlock').querySelector('p').innerHTML =
+      'Coupon codes cannot be used with duo discount. Your <strong>25% duo discount</strong> is already applied!';
+    document.getElementById('grpNoticeText').innerHTML = 'Duo discount of <strong>25%</strong> applied automatically!';
+  } else if (t === 'group') {
     state.discountPct = 50;
     lockCoupon(true);
     document.getElementById('couponFg').style.display = 'none';
     document.getElementById('grpCouponBlock').style.display = 'flex';
+    grpSection.style.display = 'block';
+    if (grpRow3) grpRow3.style.display = '';
+    if (addBtn)  addBtn.style.display  = '';
+    if (grpHint) grpHint.innerHTML = 'Minimum 3 people &#8212; <strong>50% group discount</strong> applies!';
+    document.getElementById('grpCouponBlock').querySelector('p').innerHTML =
+      'Coupon codes cannot be used with group discount. Your <strong>50% group discount</strong> is already applied!';
+    document.getElementById('grpNoticeText').innerHTML = 'Group discount of <strong>50%</strong> applied automatically!';
   } else {
     state.discountPct = 0;
+    state.members = 1;
     lockCoupon(false);
     document.getElementById('couponFg').style.display = 'block';
     document.getElementById('grpCouponBlock').style.display = 'none';
+    grpSection.style.display = 'none';
+    if (grpRow3) grpRow3.style.display = '';
+    if (addBtn)  addBtn.style.display  = '';
   }
+
   updatePriceSummary();
 }
 
@@ -215,8 +249,9 @@ function addMember() {
 
 function removeMember(btn) {
   const list = document.getElementById('grpList');
-  if (list.querySelectorAll('.gmrow').length <= 2) {
-    alert('Minimum 3 people required for group registration.');
+  const minRows = state.type === 'duo' ? 1 : 2;
+  if (list.querySelectorAll('.gmrow').length <= minRows) {
+    alert(state.type === 'duo' ? 'Duo requires 2 people.' : 'Minimum 3 people required for group registration.');
     return;
   }
   btn.closest('.gmrow').remove();
@@ -235,7 +270,11 @@ function renumberMembers() {
 }
 
 function updateMemberCount() {
-  state.members = document.getElementById('grpList').querySelectorAll('.gmrow').length + 1;
+  if (state.type === 'duo') {
+    state.members = 2;
+  } else {
+    state.members = document.getElementById('grpList').querySelectorAll('.gmrow').length + 1;
+  }
 }
 
 // ── COUPON ────────────────────────────────────────────────────────────
@@ -304,6 +343,8 @@ function updatePriceSummary() {
     document.getElementById('discLabel').textContent =
       state.type === 'group'
         ? 'Group discount (50%)'
+        : state.type === 'duo'
+        ? 'Duo discount (25%)'
         : `Coupon discount (${state.discountPct}%)`;
     document.getElementById('discAmt').textContent = '- ' + formatRs(discount);
   } else {
@@ -312,7 +353,7 @@ function updatePriceSummary() {
 
   // Show/hide group notice
   document.getElementById('grpNotice').style.display =
-    state.type === 'group' ? 'flex' : 'none';
+    (state.type === 'group' || state.type === 'duo') ? 'flex' : 'none';
 }
 
 // ── PAYMENT METHOD ────────────────────────────────────────────────────

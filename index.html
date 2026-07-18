@@ -237,13 +237,14 @@
           <label>Registration Type</label>
           <div class="toggle-group">
             <button type="button" class="tbtn active" id="btnInd" onclick="setType('individual')">&#128100; Individual</button>
+            <button type="button" class="tbtn" id="btnDuo" onclick="setType('duo')">&#128145; Duo (2 people)</button>
             <button type="button" class="tbtn" id="btnGrp" onclick="setType('group')">&#128111; Group (3+ people)</button>
           </div>
         </div>
         <div id="grpSection" style="display:none">
           <div class="fg">
             <label>Group Members</label>
-            <p class="hint">Minimum 3 people &#8212; <strong>50% group discount</strong> applies!</p>
+            <p class="hint" id="grpHint">Minimum 3 people &#8212; <strong>50% group discount</strong> applies!</p>
             <div id="grpList">
               <div class="gmrow">
                 <span class="gnum">2.</span>
@@ -251,14 +252,14 @@
                 <input type="tel" class="minput mphone" placeholder="Phone (11 digits) *" maxlength="11">
                 <button type="button" class="remove-member" onclick="removeMember(this)">&#10005;</button>
               </div>
-              <div class="gmrow">
+              <div class="gmrow" id="grpRow3">
                 <span class="gnum">3.</span>
                 <input type="text" class="minput mname" placeholder="Member 3 name *">
                 <input type="tel" class="minput mphone" placeholder="Phone (11 digits) *" maxlength="11">
                 <button type="button" class="remove-member" onclick="removeMember(this)">&#10005;</button>
               </div>
             </div>
-            <button type="button" class="add-member" onclick="addMember()">+ Add Another Member</button>
+            <button type="button" class="add-member" id="addMemberBtn" onclick="addMember()">+ Add Another Member</button>
           </div>
         </div>
         <div class="fnav"><span></span><button type="button" class="btn btn-primary" onclick="goStep(2)">Next Step &#8594;</button></div>
@@ -281,10 +282,10 @@
           <input type="text" id="referredBy" placeholder="e.g. @blogger_name or Instagram ID">
         </div>
         <div class="disc-notice grp-coupon-block" id="grpCouponBlock" style="display:none;">
-          <span>🚫</span><p>Coupon codes cannot be used with group discount. Your <strong>50% group discount</strong> is already applied!</p>
+          <span>🚫</span><p>Coupon codes cannot be used with group discount. Your group discount is already applied!</p>
         </div>
         <div class="disc-notice" id="grpNotice" style="display:none">
-          <span>&#128111;</span><p>Group discount of <strong>50%</strong> applied automatically!</p>
+          <span>&#128111;</span><p id="grpNoticeText">Group discount applied automatically!</p>
         </div>
         <div class="fnav">
           <button type="button" class="btn btn-ghost" onclick="goStep(1)">&#8592; Back</button>
