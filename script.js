@@ -486,6 +486,7 @@ function saveAndConfirm() {
     PaymentMethod: method,
     TransactionID: txn,
     Activity: state.activity === 'canvas' ? 'Canvas Painting' : state.activity === 'trinket' ? 'Trinket Tray' : '-',
+    MemberActivities: memberActivities.map(function(a){ return a === 'trinket' ? 'Trinket Tray' : 'Canvas Painting'; }).join(' | ') || '-',
   };
 
   // ── Save to Google Sheet + send Telegram + upload screenshot ────

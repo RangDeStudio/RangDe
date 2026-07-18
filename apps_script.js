@@ -50,14 +50,39 @@ function doGet(e) {
       var data  = JSON.parse(e.parameter.data);
 
       if (sheet.getLastRow() === 0) {
-        sheet.appendRow(['Date','Name','Email','Phone','Type','Members',
-                         'GroupMemberNames','GroupMemNumB','CouponUsed','Discount',
+        sheet.appendRow(['Date','Name','Phone','Email','Role','Type','CouponUsed','Discount',
                          'ReferredBy','TotalPaid','Activity','PaymentMethod','TransactionID','InvoiceID']);
       }
-      var cols = ['Date','Name','Email','Phone','Type','Members',
-                  'GroupMemberNames','GroupMemNumB','CouponUsed','Discount',
-                  'ReferredBy','TotalPaid','Activity','PaymentMethod','TransactionID','InvoiceID'];
-      sheet.appendRow(cols.map(function(h){ return data[h] || ''; }));
+
+      var date    = data.Date   || '';
+      var invId   = data.InvoiceID || '';
+      var coupon  = data.CouponUsed || '-';
+      var disc    = data.Discount || '0%';
+      var ref     = data.ReferredBy || '-';
+      var total   = data.TotalPaid || '-';
+      var method  = data.PaymentMethod || '-';
+      var txn     = data.TransactionID || '-';
+      var regType = data.Type || 'Individual';
+      var activity = data.Activity || '-';
+
+      // Main registrant row
+      sheet.appendRow([date, data.Name||'', data.Phone||'', data.Email||'',
+                       regType === 'Individual' ? 'Individual' : 'Group Lead',
+                       regType, coupon, disc, ref, total, activity, method, txn, invId]);
+
+      // Group/Duo member rows
+      if (data.GroupMemberNames && data.GroupMemberNames !== '-') {
+        var names     = (data.GroupMemberNames || '').split(' | ');
+        var phones    = (data.GroupMemNumB     || '').split(' | ');
+        var acts      = (data.MemberActivities || '').split(' | ');
+        names.forEach(function(n, i) {
+          if (!n || n === '-') return;
+          sheet.appendRow([date, n.trim(), (phones[i]||'').trim(), '',
+                           'Group Member', regType, coupon, disc, ref,
+                           total, (acts[i]||'Canvas Painting').trim(),
+                           method, txn, invId]);
+        });
+      }
 
       // Telegram text
       var msg = '🎨 <b>New RangDe Registration!</b>\n\n'
@@ -71,9 +96,12 @@ function doGet(e) {
       if (data.Type === 'Group' && data.GroupMemberNames && data.GroupMemberNames !== '-') {
         var names  = (data.GroupMemberNames || '').split(' | ');
         var phones = (data.GroupMemNumB     || '').split(' | ');
+        var acts   = (data.MemberActivities || '').split(' | ');
         msg += '\n👥 <b>Group Members:</b>\n';
         names.forEach(function(n, i) {
-          msg += '  ' + (i+2) + '. ' + n + (phones[i] ? ' — ' + phones[i] : '') + '\n';
+          msg += '  ' + (i+2) + '. ' + n
+            + (phones[i] ? ' — ' + phones[i] : '')
+            + (acts[i]   ? ' (' + acts[i] + ')' : '') + '\n';
         });
         msg += '\n';
       }
