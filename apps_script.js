@@ -37,82 +37,24 @@ function updateSummaryTab() {
     summSheet.clearContents();
     summSheet.clearFormats();
 
-    // ── Title ──────────────────────────────────────────────────────
-    summSheet.getRange('A1').setValue('RangDe Registration Summary');
-    summSheet.getRange('A1').setFontWeight('bold').setFontSize(14)
-      .setBackground('#ca3027').setFontColor('#ffffff');
+    // Headers
+    summSheet.getRange('A1').setValue('🪆 Trinket Tray');
+    summSheet.getRange('B1').setValue('🎨 Canvas Painting');
+    summSheet.getRange('C1').setValue('🎉 100% Free (MUN27)');
+    summSheet.getRange('A1:C1').setFontWeight('bold').setFontSize(11)
+      .setBackground('#ca3027').setFontColor('#ffffff').setHorizontalAlignment('center');
 
-    // ── TABLE 1: Trinket Tray ──────────────────────────────────────
-    summSheet.getRange('A3').setValue('🪆 TRINKET TRAY');
-    summSheet.getRange('A3').setFontWeight('bold').setFontSize(12)
-      .setBackground('#f0615a').setFontColor('#ffffff');
-    summSheet.getRange('A4').setValue('Name');
-    summSheet.getRange('B4').setValue('Phone');
-    summSheet.getRange('C4').setValue('Role');
-    summSheet.getRange('A4:C4').setFontWeight('bold').setBackground('#ffe0de').setFontColor('#2c1810');
-    summSheet.getRange('A5').setFormula(
-      '=IFERROR(FILTER(Sheet1!B:B,Sheet1!K:K="Trinket Tray",Sheet1!B:B<>"",Sheet1!B:B<>"Name"),"No trinket registrations yet")');
-    summSheet.getRange('B5').setFormula(
-      '=IFERROR(FILTER(Sheet1!D:D,Sheet1!K:K="Trinket Tray",Sheet1!B:B<>"",Sheet1!B:B<>"Name"),"")');
-    summSheet.getRange('C5').setFormula(
-      '=IFERROR(FILTER(Sheet1!E:E,Sheet1!K:K="Trinket Tray",Sheet1!B:B<>"",Sheet1!B:B<>"Name"),"")');
+    // Names only — FILTER formula pulls from Sheet1 automatically
+    summSheet.getRange('A2').setFormula(
+      '=IFERROR(FILTER(Sheet1!B:B,Sheet1!K:K="Trinket Tray",Sheet1!B:B<>"",Sheet1!B:B<>"Name"),"")');
+    summSheet.getRange('B2').setFormula(
+      '=IFERROR(FILTER(Sheet1!B:B,Sheet1!K:K="Canvas Painting",Sheet1!B:B<>"",Sheet1!B:B<>"Name"),"")');
+    summSheet.getRange('C2').setFormula(
+      '=IFERROR(FILTER(Sheet1!B:B,Sheet1!G:G="MUN27",Sheet1!B:B<>"",Sheet1!B:B<>"Name"),"")');
 
-    // ── TABLE 2: Canvas Painting ───────────────────────────────────
-    summSheet.getRange('E3').setValue('🎨 CANVAS PAINTING');
-    summSheet.getRange('E3').setFontWeight('bold').setFontSize(12)
-      .setBackground('#ca3027').setFontColor('#ffffff');
-    summSheet.getRange('E4').setValue('Name');
-    summSheet.getRange('F4').setValue('Phone');
-    summSheet.getRange('G4').setValue('Role');
-    summSheet.getRange('E4:G4').setFontWeight('bold').setBackground('#ffe0de').setFontColor('#2c1810');
-    summSheet.getRange('E5').setFormula(
-      '=IFERROR(FILTER(Sheet1!B:B,Sheet1!K:K="Canvas Painting",Sheet1!B:B<>"",Sheet1!B:B<>"Name"),"No canvas registrations yet")');
-    summSheet.getRange('F5').setFormula(
-      '=IFERROR(FILTER(Sheet1!D:D,Sheet1!K:K="Canvas Painting",Sheet1!B:B<>"",Sheet1!B:B<>"Name"),"")');
-    summSheet.getRange('G5').setFormula(
-      '=IFERROR(FILTER(Sheet1!E:E,Sheet1!K:K="Canvas Painting",Sheet1!B:B<>"",Sheet1!B:B<>"Name"),"")');
-
-    // ── TABLE 3: Free / Heavy Discount (100% + 75%) ────────────────
-    summSheet.getRange('I3').setValue('🎉 FREE / 75%+ DISCOUNT');
-    summSheet.getRange('I3').setFontWeight('bold').setFontSize(12)
-      .setBackground('#2c1810').setFontColor('#ffffff');
-    summSheet.getRange('I4').setValue('Name');
-    summSheet.getRange('J4').setValue('Phone');
-    summSheet.getRange('K4').setValue('Coupon');
-    summSheet.getRange('L4').setValue('Discount');
-    summSheet.getRange('I4:L4').setFontWeight('bold').setBackground('#ffe0de').setFontColor('#2c1810');
-    summSheet.getRange('I5').setFormula(
-      '=IFERROR(FILTER(Sheet1!B:B,(Sheet1!H:H="100%")+(Sheet1!H:H="75%"),Sheet1!B:B<>"",Sheet1!B:B<>"Name"),"No free/75% registrations yet")');
-    summSheet.getRange('J5').setFormula(
-      '=IFERROR(FILTER(Sheet1!D:D,(Sheet1!H:H="100%")+(Sheet1!H:H="75%"),Sheet1!B:B<>"",Sheet1!B:B<>"Name"),"")');
-    summSheet.getRange('K5').setFormula(
-      '=IFERROR(FILTER(Sheet1!G:G,(Sheet1!H:H="100%")+(Sheet1!H:H="75%"),Sheet1!B:B<>"",Sheet1!B:B<>"Name"),"")');
-    summSheet.getRange('L5').setFormula(
-      '=IFERROR(FILTER(Sheet1!H:H,(Sheet1!H:H="100%")+(Sheet1!H:H="75%"),Sheet1!B:B<>"",Sheet1!B:B<>"Name"),"")');
-
-    // ── Counts row at bottom ───────────────────────────────────────
-    summSheet.getRange('A2').setValue('Trinket: ' );
-    summSheet.getRange('B2').setFormula('=COUNTIF(Sheet1!K:K,"Trinket Tray")');
-    summSheet.getRange('E2').setValue('Canvas: ');
-    summSheet.getRange('F2').setFormula('=COUNTIF(Sheet1!K:K,"Canvas Painting")');
-    summSheet.getRange('I2').setValue('Free/75%: ');
-    summSheet.getRange('J2').setFormula('=COUNTIF(Sheet1!H:H,"100%")+COUNTIF(Sheet1!H:H,"75%")');
-
-    summSheet.getRange('A2:B2').setFontWeight('bold').setFontColor('#ca3027');
-    summSheet.getRange('E2:F2').setFontWeight('bold').setFontColor('#ca3027');
-    summSheet.getRange('I2:J2').setFontWeight('bold').setFontColor('#ca3027');
-
-    // Column widths
-    summSheet.setColumnWidth(1, 180);
-    summSheet.setColumnWidth(2, 130);
-    summSheet.setColumnWidth(3, 110);
-    summSheet.setColumnWidth(5, 180);
-    summSheet.setColumnWidth(6, 130);
-    summSheet.setColumnWidth(7, 110);
-    summSheet.setColumnWidth(9, 180);
-    summSheet.setColumnWidth(10, 130);
-    summSheet.setColumnWidth(11, 100);
-    summSheet.setColumnWidth(12, 80);
+    summSheet.setColumnWidth(1, 200);
+    summSheet.setColumnWidth(2, 200);
+    summSheet.setColumnWidth(3, 200);
 
   } catch(e) { Logger.log('Summary error: ' + e.toString()); }
 }
