@@ -52,11 +52,11 @@ function doGet(e) {
       if (sheet.getLastRow() === 0) {
         sheet.appendRow(['Date','Name','Email','Phone','Type','Members',
                          'GroupMemberNames','GroupMemNumB','CouponUsed','Discount',
-                         'ReferredBy','TotalPaid','PaymentMethod','TransactionID','InvoiceID']);
+                         'ReferredBy','TotalPaid','Activity','PaymentMethod','TransactionID','InvoiceID']);
       }
       var cols = ['Date','Name','Email','Phone','Type','Members',
                   'GroupMemberNames','GroupMemNumB','CouponUsed','Discount',
-                  'ReferredBy','TotalPaid','PaymentMethod','TransactionID','InvoiceID'];
+                  'ReferredBy','TotalPaid','Activity','PaymentMethod','TransactionID','InvoiceID'];
       sheet.appendRow(cols.map(function(h){ return data[h] || ''; }));
 
       // Telegram text
@@ -82,6 +82,7 @@ function doGet(e) {
         + '� <b>Referred by:</b> '+ (data.ReferredBy   || '-') + '\n'
         + '�💸 <b>Discount:</b> '  + (data.Discount     || '0%')+ '\n'
         + '💰 <b>Total Paid:</b> '+ (data.TotalPaid    || '-') + '\n'
+        + '🎨 <b>Activity:</b> '  + (data.Activity     || '-') + '\n'
         + '💳 <b>Payment:</b> '   + (data.PaymentMethod|| '-') + '\n'
         + '🔖 <b>Txn ID:</b> '    + (data.TransactionID|| '-') + '\n'
         + '🎟 <b>Invoice ID:</b> '+ (data.InvoiceID    || '-') + '\n'
@@ -177,8 +178,7 @@ function doPost(e) {
     var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_NAME);
     if (sheet.getLastRow() === 0) {
       sheet.appendRow(['Date','Name','Email','Phone','Type','Members',
-                       'GroupMemberNames','GroupMemNumB','CouponUsed','Discount',
-                       'TotalPaid','PaymentMethod','TransactionID','InvoiceID']);
+                       'Groc']);
     }
     var cols = ['Date','Name','Email','Phone','Type','Members',
                 'GroupMemberNames','GroupMemNumB','CouponUsed','Discount',

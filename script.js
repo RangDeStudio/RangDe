@@ -28,6 +28,7 @@ let state = {
   paymentMethod: '',
   fileUploaded: false,
   currentStep: 1,
+  activity: '',
 };
 
 // ── CAROUSEL ─────────────────────────────────────────────────────────
@@ -163,6 +164,7 @@ function validateStep(n) {
       const ref = document.getElementById('referredBy').value.trim();
       if (!ref) { alert('Please enter who referred this coupon to you.'); return false; }
     }
+    if (!state.activity) { alert('Please choose your activity — Canvas Painting or Trinket Tray.'); return false; }
   }
   return true;
 }
@@ -357,7 +359,20 @@ function updatePriceSummary() {
     (state.type === 'group' || state.type === 'duo') ? 'flex' : 'none';
 }
 
-// ── PAYMENT METHOD ────────────────────────────────────────────────────
+// ── ACTIVITY SELECTION ────────────────────────────────────────────────
+function selectActivity(activity) {
+  state.activity = activity;
+  document.getElementById('btnActCanvas').classList.toggle('active', activity === 'canvas');
+  document.getElementById('btnActTrinket').classList.toggle('active', activity === 'trinket');
+  const upsell = document.getElementById('activityUpsell');
+  if (activity === 'canvas') {
+    upsell.style.display = 'block';
+    upsell.innerHTML = '&#129695; <strong>Want to also paint a Trinket Tray?</strong> You can add it on the spot for just <strong>Rs. 500</strong> extra!';
+  } else {
+    upsell.style.display = 'block';
+    upsell.innerHTML = '&#127912; <strong>Want to also do Canvas Painting?</strong> You can add it on the spot for just <strong>Rs. 500</strong> extra!';
+  }
+}
 function selectPM(method) {
   state.paymentMethod = method;
   document.getElementById('payInstr').style.display = 'block';
@@ -455,6 +470,7 @@ function saveAndConfirm() {
     TotalPaid: total === 0 ? 'FREE' : 'Rs. ' + total,
     PaymentMethod: method,
     TransactionID: txn,
+    Activity: state.activity === 'canvas' ? 'Canvas Painting' : state.activity === 'trinket' ? 'Trinket Tray' : '-',
   };
 
   // ── Save to Google Sheet + send Telegram + upload screenshot ────

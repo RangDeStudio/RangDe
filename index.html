@@ -287,6 +287,17 @@
         <div class="disc-notice" id="grpNotice" style="display:none">
           <span>&#128111;</span><p id="grpNoticeText">Group discount applied automatically!</p>
         </div>
+
+        <!-- ACTIVITY SELECTION -->
+        <div class="fg" style="margin-top:18px;">
+          <label>Choose Your Activity *</label>
+          <p style="font-size:.8rem;color:var(--text-light);margin-bottom:12px;">Select what you want to paint. You can add the other activity on-spot for just <strong>Rs. 500</strong>.</p>
+          <div class="toggle-group">
+            <button type="button" class="tbtn" id="btnActCanvas" onclick="selectActivity('canvas')">&#127912; Canvas Painting</button>
+            <button type="button" class="tbtn" id="btnActTrinket" onclick="selectActivity('trinket')">&#129695; Trinket Tray</button>
+          </div>
+          <div class="activity-upsell" id="activityUpsell" style="display:none"></div>
+        </div>
         <div class="fnav">
           <button type="button" class="btn btn-ghost" onclick="goStep(1)">&#8592; Back</button>
           <button type="button" class="btn btn-primary" onclick="goStep(3)">Next Step &#8594;</button>
