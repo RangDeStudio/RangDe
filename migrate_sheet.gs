@@ -61,29 +61,60 @@ function buildSummaryTab(ss) {
   var summSheet = ss.getSheetByName('Summary');
   if (!summSheet) summSheet = ss.insertSheet('Summary');
   summSheet.clearContents();
+  summSheet.clearFormats();
 
   summSheet.getRange('A1').setValue('RangDe Registration Summary');
   summSheet.getRange('A1').setFontWeight('bold').setFontSize(14).setBackground('#ca3027').setFontColor('#ffffff');
 
-  summSheet.getRange('A3').setValue('Activity');
-  summSheet.getRange('B3').setValue('Count');
-  summSheet.getRange('A3:B3').setFontWeight('bold').setBackground('#f0615a').setFontColor('#ffffff');
+  // TABLE 1: Trinket Tray
+  summSheet.getRange('A3').setValue('🪆 TRINKET TRAY');
+  summSheet.getRange('A3').setFontWeight('bold').setFontSize(12).setBackground('#f0615a').setFontColor('#ffffff');
+  summSheet.getRange('A4').setValue('Name');
+  summSheet.getRange('B4').setValue('Phone');
+  summSheet.getRange('C4').setValue('Role');
+  summSheet.getRange('A4:C4').setFontWeight('bold').setBackground('#ffe0de');
+  summSheet.getRange('A5').setFormula('=IFERROR(FILTER(Sheet1!B:B,Sheet1!K:K="Trinket Tray",Sheet1!B:B<>"",Sheet1!B:B<>"Name"),"No trinket registrations yet")');
+  summSheet.getRange('B5').setFormula('=IFERROR(FILTER(Sheet1!D:D,Sheet1!K:K="Trinket Tray",Sheet1!B:B<>"",Sheet1!B:B<>"Name"),"")');
+  summSheet.getRange('C5').setFormula('=IFERROR(FILTER(Sheet1!E:E,Sheet1!K:K="Trinket Tray",Sheet1!B:B<>"",Sheet1!B:B<>"Name"),"")');
 
-  summSheet.getRange('A4').setValue('Canvas Painting');
-  summSheet.getRange('B4').setFormula('=COUNTIF(Sheet1!K:K,"Canvas Painting")');
+  // TABLE 2: Canvas Painting
+  summSheet.getRange('E3').setValue('🎨 CANVAS PAINTING');
+  summSheet.getRange('E3').setFontWeight('bold').setFontSize(12).setBackground('#ca3027').setFontColor('#ffffff');
+  summSheet.getRange('E4').setValue('Name');
+  summSheet.getRange('F4').setValue('Phone');
+  summSheet.getRange('G4').setValue('Role');
+  summSheet.getRange('E4:G4').setFontWeight('bold').setBackground('#ffe0de');
+  summSheet.getRange('E5').setFormula('=IFERROR(FILTER(Sheet1!B:B,Sheet1!K:K="Canvas Painting",Sheet1!B:B<>"",Sheet1!B:B<>"Name"),"No canvas registrations yet")');
+  summSheet.getRange('F5').setFormula('=IFERROR(FILTER(Sheet1!D:D,Sheet1!K:K="Canvas Painting",Sheet1!B:B<>"",Sheet1!B:B<>"Name"),"")');
+  summSheet.getRange('G5').setFormula('=IFERROR(FILTER(Sheet1!E:E,Sheet1!K:K="Canvas Painting",Sheet1!B:B<>"",Sheet1!B:B<>"Name"),"")');
 
-  summSheet.getRange('A5').setValue('Trinket Tray');
-  summSheet.getRange('B5').setFormula('=COUNTIF(Sheet1!K:K,"Trinket Tray")');
+  // TABLE 3: Free / 75% discount
+  summSheet.getRange('I3').setValue('🎉 FREE / 75%+ DISCOUNT');
+  summSheet.getRange('I3').setFontWeight('bold').setFontSize(12).setBackground('#2c1810').setFontColor('#ffffff');
+  summSheet.getRange('I4').setValue('Name');
+  summSheet.getRange('J4').setValue('Phone');
+  summSheet.getRange('K4').setValue('Coupon');
+  summSheet.getRange('L4').setValue('Discount');
+  summSheet.getRange('I4:L4').setFontWeight('bold').setBackground('#ffe0de');
+  summSheet.getRange('I5').setFormula('=IFERROR(FILTER(Sheet1!B:B,(Sheet1!H:H="100%")+(Sheet1!H:H="75%"),Sheet1!B:B<>"",Sheet1!B:B<>"Name"),"No free/75% registrations yet")');
+  summSheet.getRange('J5').setFormula('=IFERROR(FILTER(Sheet1!D:D,(Sheet1!H:H="100%")+(Sheet1!H:H="75%"),Sheet1!B:B<>"",Sheet1!B:B<>"Name"),"")');
+  summSheet.getRange('K5').setFormula('=IFERROR(FILTER(Sheet1!G:G,(Sheet1!H:H="100%")+(Sheet1!H:H="75%"),Sheet1!B:B<>"",Sheet1!B:B<>"Name"),"")');
+  summSheet.getRange('L5').setFormula('=IFERROR(FILTER(Sheet1!H:H,(Sheet1!H:H="100%")+(Sheet1!H:H="75%"),Sheet1!B:B<>"",Sheet1!B:B<>"Name"),"")');
 
-  summSheet.getRange('A7').setValue('Total Registrations');
-  summSheet.getRange('B7').setFormula('=COUNTA(Sheet1!B:B)-1');
+  // Counts
+  summSheet.getRange('A2').setValue('Trinket: ');
+  summSheet.getRange('B2').setFormula('=COUNTIF(Sheet1!K:K,"Trinket Tray")');
+  summSheet.getRange('E2').setValue('Canvas: ');
+  summSheet.getRange('F2').setFormula('=COUNTIF(Sheet1!K:K,"Canvas Painting")');
+  summSheet.getRange('I2').setValue('Free/75%: ');
+  summSheet.getRange('J2').setFormula('=COUNTIF(Sheet1!H:H,"100%")+COUNTIF(Sheet1!H:H,"75%")');
+  summSheet.getRange('A2:B2').setFontWeight('bold').setFontColor('#ca3027');
+  summSheet.getRange('E2:F2').setFontWeight('bold').setFontColor('#ca3027');
+  summSheet.getRange('I2:J2').setFontWeight('bold').setFontColor('#ca3027');
 
-  summSheet.getRange('A8').setValue('Total Revenue (Rs.)');
-  summSheet.getRange('B8').setFormula('=SUMPRODUCT(IFERROR(VALUE(SUBSTITUTE(IF(ISNUMBER(SEARCH("Rs.",Sheet1!J:J)),SUBSTITUTE(Sheet1!J:J,"Rs. ",""),"0"),",","")),0))');
+  summSheet.setColumnWidth(1,180); summSheet.setColumnWidth(2,130); summSheet.setColumnWidth(3,110);
+  summSheet.setColumnWidth(5,180); summSheet.setColumnWidth(6,130); summSheet.setColumnWidth(7,110);
+  summSheet.setColumnWidth(9,180); summSheet.setColumnWidth(10,130); summSheet.setColumnWidth(11,100); summSheet.setColumnWidth(12,80);
 
-  summSheet.getRange('A7:B8').setFontWeight('bold');
-  summSheet.setColumnWidth(1, 220);
-  summSheet.setColumnWidth(2, 120);
-
-  Logger.log('Summary tab created!');
+  Logger.log('Summary tab built!');
 }
