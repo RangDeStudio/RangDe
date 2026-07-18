@@ -1,7 +1,6 @@
 ﻿// ── COUPON CODES ─────────────────────────────────────────────────────
 // code → discount percentage
 const COUPONS = {
-  'MUN27':      100,   // 100% off — full free
   'FRIENDS10':  10,    // 10% off — friends
   'BLOGGERS25': 25,    // 25% off — bloggers
   'BLOGGER50':  50,    // 50% off — bloggers
