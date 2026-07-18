@@ -7,7 +7,7 @@ function migrateSheet() {
   sheet.clearContents();
 
   // New headers
-  var headers = ['Date','Name','Phone','Email','Role','Type','CouponUsed',
+  var headers = ['Date','Name','Email','Phone','Role','Type','CouponUsed',
                  'Discount','ReferredBy','TotalPaid','Activity',
                  'PaymentMethod','TransactionID','InvoiceID'];
   sheet.appendRow(headers);
@@ -32,7 +32,7 @@ function migrateSheet() {
     var leadAmt = isFree ? '0' : d.TotalPaid;
 
     // Main person row
-    sheet.appendRow([d.Date, d.Name, d.Phone, d.Email, role, d.Type,
+    sheet.appendRow([d.Date, d.Name, d.Email, d.Phone, role, d.Type,
                      d.CouponUsed, d.Discount, '-', leadAmt, d.Activity,
                      d.PaymentMethod, d.TransactionID, d.InvoiceID]);
 
@@ -43,7 +43,7 @@ function migrateSheet() {
       var acts   = d.GroupMemberActivities ? d.GroupMemberActivities.split(' | ') : [];
       names.forEach(function(n, i) {
         if (!n.trim()) return;
-        sheet.appendRow([d.Date, n.trim(), (phones[i]||'').trim(), '',
+        sheet.appendRow([d.Date, n.trim(), '', (phones[i]||'').trim(),
                          'Group Member', d.Type, d.CouponUsed, d.Discount, '-',
                          '0', (acts[i]||'Canvas Painting').trim(),
                          d.PaymentMethod, d.TransactionID, d.InvoiceID]);

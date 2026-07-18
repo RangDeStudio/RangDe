@@ -80,7 +80,7 @@ function doGet(e) {
 
       // Add headers if sheet is empty
       if (sheet.getLastRow() === 0) {
-        sheet.appendRow(['Date','Name','Phone','Email','Role','Type','CouponUsed',
+        sheet.appendRow(['Date','Name','Email','Phone','Role','Type','CouponUsed',
                          'Discount','ReferredBy','TotalPaid','Activity',
                          'PaymentMethod','TransactionID','InvoiceID']);
         sheet.getRange(1,1,1,14).setFontWeight('bold').setBackground('#2c1810').setFontColor('#ffffff');
@@ -100,7 +100,7 @@ function doGet(e) {
       var leadAmt  = isFree ? '0' : total;
 
       // Main registrant
-      sheet.appendRow([date, data.Name||'', data.Phone||'', data.Email||'',
+      sheet.appendRow([date, data.Name||'', data.Email||'', data.Phone||'',
                        regType==='Individual' ? 'Individual' : 'Group Lead',
                        regType, coupon, disc, ref, leadAmt, activity, method, txn, invId]);
 
@@ -111,7 +111,7 @@ function doGet(e) {
         var acts  = (data.MemberActivities||'').split(' | ');
         names.forEach(function(n,i){
           if (!n||n==='-') return;
-          sheet.appendRow([date, n.trim(), (phones[i]||'').trim(), '',
+          sheet.appendRow([date, n.trim(), '', (phones[i]||'').trim(),
                            'Group Member', regType, coupon, disc, ref, '0',
                            (acts[i]||'Canvas Painting').trim(), method, txn, invId]);
         });
