@@ -540,11 +540,11 @@ h3{font-size:clamp(1.1rem,3vw,1.5rem);}
 }
 
 /* ===== MEMBER ROW ACTIVITY ===== */
-.gmrow { flex-wrap: wrap; gap: 6px; }
-.mactivity { display:flex; gap:4px; align-items:center; }
+.gmrow { flex-wrap: wrap; gap: 6px; align-items: center; }
+.mactivity { display:flex; gap:6px; align-items:center; width:100%; margin-top:4px; }
 .tbtn-sm {
-  padding: 5px 10px !important;
-  font-size: .8rem !important;
+  padding: 6px 14px !important;
+  font-size: .78rem !important;
   min-width: 0 !important;
   border-radius: 50px !important;
 }
