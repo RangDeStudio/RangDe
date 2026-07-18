@@ -14,6 +14,7 @@ const COUPONS = {
   'FATIMA25':   25,    // 25% off
   'SAIMA20':    20,    // 20% off
   'SAIMA30':    30,    // 30% off
+  'RABIART20':  20,    // 20% off
 };
 const BASE_PRICE = 1800;
 
