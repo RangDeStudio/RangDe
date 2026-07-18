@@ -42,21 +42,18 @@ function updateSheetSummary(sheet) {
       var val = sheet.getRange(r, 1).getValue();
       if (val === '--- SUMMARY ---') {
         sheet.deleteRows(r, lastRow - r + 1);
-        lastRow = r - 1;
         break;
       }
     }
-    var dataRange = 'K2:K' + lastRow;
+    // Use full column so new rows are always included
     sheet.appendRow(['']);
     sheet.appendRow(['--- SUMMARY ---']);
     sheet.appendRow(['Activity', 'Count']);
-    sheet.appendRow(['Canvas Painting', '=COUNTIF(' + dataRange + ',"Canvas Painting")']);
-    sheet.appendRow(['Trinket Tray',    '=COUNTIF(' + dataRange + ',"Trinket Tray")']);
-    sheet.appendRow(['Not Selected',    '=COUNTIF(' + dataRange + ',"-")']);
+    sheet.appendRow(['Canvas Painting', '=COUNTIF(K:K,"Canvas Painting")']);
+    sheet.appendRow(['Trinket Tray',    '=COUNTIF(K:K,"Trinket Tray")']);
     sheet.appendRow(['']);
-    sheet.appendRow(['Total Registrations', '=COUNTA(B2:B' + lastRow + ')']);
-    sheet.appendRow(['Total Revenue',       '=SUMPRODUCT((ISNUMBER(FIND("Rs.",J2:J' + lastRow + ')))*IFERROR(VALUE(SUBSTITUTE(SUBSTITUTE(J2:J' + lastRow + ',"Rs. ",""),",","")),0))']);
-    var summRow = sheet.getLastRow() - 7;
+    sheet.appendRow(['Total Revenue (Rs.)', '=SUMPRODUCT(IFERROR(VALUE(SUBSTITUTE(IF(ISNUMBER(SEARCH("Rs.",J:J)),SUBSTITUTE(J:J,"Rs. ",""),"0"),",","")),0))']);
+    var summRow = sheet.getLastRow() - 6;
     sheet.getRange(summRow, 1).setFontWeight('bold').setBackground('#ca3027').setFontColor('#ffffff');
   } catch(e) {}
 }
@@ -93,27 +90,44 @@ function doGet(e) {
       var regType = data.Type || 'Individual';
       var activity = data.Activity || '-';
 
-      var isFree   = (total + '').toUpperCase().includes('FREE');
-      var leadAmt  = isFree ? '0' : total;
+      var isFree  = (total + '').toUpperCase().includes('FREE');
+      var leadAmt = isFree ? '0' : total;
 
-      // Main registrant row
-      sheet.appendRow([date, data.Name||'', data.Phone||'', data.Email||'',
-                       regType === 'Individual' ? 'Individual' : 'Group Lead',
-                       regType, coupon, disc, ref, leadAmt, activity, method, txn, invId]);
+      // Find summary row — insert data rows BEFORE it
+      var insertBefore = sheet.getLastRow() + 1; // default: append
+      var allVals = sheet.getRange(1, 1, sheet.getLastRow(), 1).getValues();
+      for (var r = 0; r < allVals.length; r++) {
+        if (allVals[r][0] === '--- SUMMARY ---') {
+          insertBefore = r + 1; // 1-indexed, blank row above summary
+          break;
+        }
+      }
 
-      // Group/Duo member rows — amount is 0
+      // Insert rows before summary
+      var rowsToInsert = [
+        [date, data.Name||'', data.Phone||'', data.Email||'',
+         regType === 'Individual' ? 'Individual' : 'Group Lead',
+         regType, coupon, disc, ref, leadAmt, activity, method, txn, invId]
+      ];
+
+      // Group/Duo member rows
       if (data.GroupMemberNames && data.GroupMemberNames !== '-') {
-        var names     = (data.GroupMemberNames || '').split(' | ');
-        var phones    = (data.GroupMemNumB     || '').split(' | ');
-        var acts      = (data.MemberActivities || '').split(' | ');
+        var names  = (data.GroupMemberNames || '').split(' | ');
+        var phones = (data.GroupMemNumB     || '').split(' | ');
+        var acts   = (data.MemberActivities || '').split(' | ');
         names.forEach(function(n, i) {
           if (!n || n === '-') return;
-          sheet.appendRow([date, n.trim(), (phones[i]||'').trim(), '',
-                           'Group Member', regType, coupon, disc, ref,
-                           '0', (acts[i]||'Canvas Painting').trim(),
-                           method, txn, invId]);
+          rowsToInsert.push([date, n.trim(), (phones[i]||'').trim(), '',
+                             'Group Member', regType, coupon, disc, ref,
+                             '0', (acts[i]||'Canvas Painting').trim(),
+                             method, txn, invId]);
         });
       }
+
+      // Insert all rows before summary
+      sheet.insertRowsBefore(insertBefore, rowsToInsert.length);
+      var insertRange = sheet.getRange(insertBefore, 1, rowsToInsert.length, rowsToInsert[0].length);
+      insertRange.setValues(rowsToInsert);
 
       // Telegram text
       var msg = '🎨 <b>New RangDe Registration!</b>\n\n'

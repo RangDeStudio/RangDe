@@ -54,40 +54,22 @@ function migrateSheet() {
 }
 
 function addSummary(sheet) {
-  // Remove old summary if exists
   var lastRow = sheet.getLastRow();
-  // Find if summary already exists
   for (var r = lastRow; r >= 1; r--) {
     var val = sheet.getRange(r, 1).getValue();
     if (val === '--- SUMMARY ---') {
       sheet.deleteRows(r, lastRow - r + 1);
-      lastRow = r - 1;
       break;
     }
   }
-  
-  var dataLastRow = sheet.getLastRow();
-  
-  // Blank separator
   sheet.appendRow(['']);
   sheet.appendRow(['--- SUMMARY ---']);
-  
-  // Count using COUNTIF formulas on Activity column (K)
-  var actCol = 'K';
-  var dataRange = actCol + '2:' + actCol + dataLastRow;
-  
   sheet.appendRow(['Activity', 'Count']);
-  var canvasRow = sheet.getLastRow() + 1;
-  sheet.appendRow(['Canvas Painting', '=COUNTIF(' + dataRange + ',"Canvas Painting")']);
-  sheet.appendRow(['Trinket Tray',    '=COUNTIF(' + dataRange + ',"Trinket Tray")']);
-  sheet.appendRow(['Not Selected',    '=COUNTIF(' + dataRange + ',"-")']);
+  sheet.appendRow(['Canvas Painting', '=COUNTIF(K:K,"Canvas Painting")']);
+  sheet.appendRow(['Trinket Tray',    '=COUNTIF(K:K,"Trinket Tray")']);
   sheet.appendRow(['']);
-  sheet.appendRow(['Total Registrations', '=COUNTA(B2:B' + dataLastRow + ')']);
-  sheet.appendRow(['Total Revenue (Rs.)', '=SUMIF(J2:J' + dataLastRow + ',"Rs.*",J2:J' + dataLastRow + ')']);
-  
-  // Style the summary header
-  var summaryHeaderRange = sheet.getRange(dataLastRow + 2, 1);
-  summaryHeaderRange.setFontWeight('bold').setBackground('#ca3027').setFontColor('#ffffff');
-  
+  sheet.appendRow(['Total Revenue (Rs.)', '=SUMPRODUCT(IFERROR(VALUE(SUBSTITUTE(IF(ISNUMBER(SEARCH("Rs.",J:J)),SUBSTITUTE(J:J,"Rs. ",""),"0"),",","")),0))']);
+  var summRow = sheet.getLastRow() - 6;
+  sheet.getRange(summRow, 1).setFontWeight('bold').setBackground('#ca3027').setFontColor('#ffffff');
   Logger.log('Summary added!');
 }
