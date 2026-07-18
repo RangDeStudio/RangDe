@@ -1,7 +1,7 @@
 const SHEET_NAME = 'Sheet1';
 const ADMIN_USER = 'admin@rangde.com';
 const ADMIN_PASS = 'rangde2025';
-// ⚠️ TG_TOKEN and TG_CHAT_ID are set directly in Code.gs only — never commit these to GitHub
+// ⚠️ Set these only in Code.gs — never commit real values to GitHub
 const TG_TOKEN   = 'PASTE_YOUR_BOT_TOKEN_HERE';
 const TG_CHAT_ID = 'PASTE_YOUR_CHAT_ID_HERE';
 
@@ -17,44 +17,47 @@ function sendTelegram(message) {
   } catch(e) {}
 }
 
-// ── Telegram: send photo (blob) with caption ──────────────────────────
+// ── Telegram: send photo ──────────────────────────────────────────────
 function sendTelegramPhoto(blob, caption) {
   try {
-    var formData = {
-      chat_id: TG_CHAT_ID,
-      caption: caption,
-      photo: blob,
-    };
     UrlFetchApp.fetch('https://api.telegram.org/bot' + TG_TOKEN + '/sendPhoto', {
       method: 'post',
-      payload: formData,
+      payload: { chat_id: TG_CHAT_ID, caption: caption, photo: blob },
       muteHttpExceptions: true,
     });
   } catch(e) {}
 }
 
-// ── SHEET SUMMARY ─────────────────────────────────────────────────────
-function updateSheetSummary(sheet) {
+// ── Update Summary tab (separate sheet) ──────────────────────────────
+function updateSummaryTab() {
   try {
-    var lastRow = sheet.getLastRow();
-    // Remove old summary
-    for (var r = lastRow; r >= 1; r--) {
-      var val = sheet.getRange(r, 1).getValue();
-      if (val === '--- SUMMARY ---') {
-        sheet.deleteRows(r, lastRow - r + 1);
-        break;
-      }
-    }
-    // Use full column so new rows are always included
-    sheet.appendRow(['']);
-    sheet.appendRow(['--- SUMMARY ---']);
-    sheet.appendRow(['Activity', 'Count']);
-    sheet.appendRow(['Canvas Painting', '=COUNTIF(K:K,"Canvas Painting")']);
-    sheet.appendRow(['Trinket Tray',    '=COUNTIF(K:K,"Trinket Tray")']);
-    sheet.appendRow(['']);
-    sheet.appendRow(['Total Revenue (Rs.)', '=SUMPRODUCT(IFERROR(VALUE(SUBSTITUTE(IF(ISNUMBER(SEARCH("Rs.",J:J)),SUBSTITUTE(J:J,"Rs. ",""),"0"),",","")),0))']);
-    var summRow = sheet.getLastRow() - 6;
-    sheet.getRange(summRow, 1).setFontWeight('bold').setBackground('#ca3027').setFontColor('#ffffff');
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var summSheet = ss.getSheetByName('Summary');
+    if (!summSheet) summSheet = ss.insertSheet('Summary');
+    summSheet.clearContents();
+
+    summSheet.getRange('A1').setValue('RangDe Registration Summary');
+    summSheet.getRange('A1').setFontWeight('bold').setFontSize(14).setBackground('#ca3027').setFontColor('#ffffff');
+
+    summSheet.getRange('A3').setValue('Activity');
+    summSheet.getRange('B3').setValue('Count');
+    summSheet.getRange('A3:B3').setFontWeight('bold').setBackground('#f0615a').setFontColor('#ffffff');
+
+    summSheet.getRange('A4').setValue('Canvas Painting');
+    summSheet.getRange('B4').setFormula("=COUNTIF(Sheet1!K:K,\"Canvas Painting\")");
+
+    summSheet.getRange('A5').setValue('Trinket Tray');
+    summSheet.getRange('B5').setFormula("=COUNTIF(Sheet1!K:K,\"Trinket Tray\")");
+
+    summSheet.getRange('A7').setValue('Total Registrations');
+    summSheet.getRange('B7').setFormula("=COUNTA(Sheet1!B:B)-1");
+
+    summSheet.getRange('A8').setValue('Total Revenue (Rs.)');
+    summSheet.getRange('B8').setFormula("=SUMPRODUCT(IFERROR(VALUE(SUBSTITUTE(IF(ISNUMBER(SEARCH(\"Rs.\",Sheet1!J:J)),SUBSTITUTE(Sheet1!J:J,\"Rs. \",\"\"),\"0\"),\",\",\"\")),0))");
+
+    summSheet.getRange('A7:B8').setFontWeight('bold');
+    summSheet.setColumnWidth(1, 200);
+    summSheet.setColumnWidth(2, 100);
   } catch(e) {}
 }
 
@@ -65,150 +68,118 @@ function getPaymentFolder() {
   return folders.hasNext() ? folders.next() : DriveApp.createFolder(name);
 }
 
-// ── doGet: handles registration data + photo upload + admin fetch ─────
+// ── doGet: registration data + admin fetch ────────────────────────────
 function doGet(e) {
 
-  // 1. Save registration row + send Telegram text notification
+  // Save registration row
   if (e.parameter.data) {
     try {
-      var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_NAME);
+      var ss    = SpreadsheetApp.getActiveSpreadsheet();
+      var sheet = ss.getSheetByName(SHEET_NAME);
       var data  = JSON.parse(e.parameter.data);
 
+      // Add headers if sheet is empty
       if (sheet.getLastRow() === 0) {
-        sheet.appendRow(['Date','Name','Phone','Email','Role','Type','CouponUsed','Discount',
-                         'ReferredBy','TotalPaid','Activity','PaymentMethod','TransactionID','InvoiceID']);
+        sheet.appendRow(['Date','Name','Phone','Email','Role','Type','CouponUsed',
+                         'Discount','ReferredBy','TotalPaid','Activity',
+                         'PaymentMethod','TransactionID','InvoiceID']);
+        sheet.getRange(1,1,1,14).setFontWeight('bold').setBackground('#2c1810').setFontColor('#ffffff');
       }
 
-      var date    = data.Date   || '';
-      var invId   = data.InvoiceID || '';
-      var coupon  = data.CouponUsed || '-';
-      var disc    = data.Discount || '0%';
-      var ref     = data.ReferredBy || '-';
-      var total   = data.TotalPaid || '-';
-      var method  = data.PaymentMethod || '-';
-      var txn     = data.TransactionID || '-';
-      var regType = data.Type || 'Individual';
-      var activity = data.Activity || '-';
+      var date     = data.Date          || '';
+      var invId    = data.InvoiceID     || '';
+      var coupon   = data.CouponUsed    || '-';
+      var disc     = data.Discount      || '0%';
+      var ref      = data.ReferredBy    || '-';
+      var total    = data.TotalPaid     || '-';
+      var method   = data.PaymentMethod || '-';
+      var txn      = data.TransactionID || '-';
+      var regType  = data.Type          || 'Individual';
+      var activity = data.Activity      || '-';
+      var isFree   = (total+'').toUpperCase().includes('FREE');
+      var leadAmt  = isFree ? '0' : total;
 
-      var isFree  = (total + '').toUpperCase().includes('FREE');
-      var leadAmt = isFree ? '0' : total;
+      // Main registrant
+      sheet.appendRow([date, data.Name||'', data.Phone||'', data.Email||'',
+                       regType==='Individual' ? 'Individual' : 'Group Lead',
+                       regType, coupon, disc, ref, leadAmt, activity, method, txn, invId]);
 
-      // Find summary row — insert data rows BEFORE it
-      var insertBefore = -1;
-      var allVals = sheet.getRange(1, 1, sheet.getLastRow(), 1).getValues();
-      for (var r = 0; r < allVals.length; r++) {
-        if (String(allVals[r][0]).trim() === '--- SUMMARY ---') {
-          // r is 0-indexed, sheet rows are 1-indexed
-          // insert before the blank row above summary if it exists
-          insertBefore = (r > 0 && String(allVals[r-1][0]).trim() === '') ? r : r + 1;
-          break;
-        }
-      }
-
-      // Insert rows before summary
-      var rowsToInsert = [
-        [date, data.Name||'', data.Phone||'', data.Email||'',
-         regType === 'Individual' ? 'Individual' : 'Group Lead',
-         regType, coupon, disc, ref, leadAmt, activity, method, txn, invId]
-      ];
-
-      // Group/Duo member rows
+      // Group/Duo members — each on own row, amount 0
       if (data.GroupMemberNames && data.GroupMemberNames !== '-') {
-        var names  = (data.GroupMemberNames || '').split(' | ');
-        var phones = (data.GroupMemNumB     || '').split(' | ');
-        var acts   = (data.MemberActivities || '').split(' | ');
-        names.forEach(function(n, i) {
-          if (!n || n === '-') return;
-          rowsToInsert.push([date, n.trim(), (phones[i]||'').trim(), '',
-                             'Group Member', regType, coupon, disc, ref,
-                             '0', (acts[i]||'Canvas Painting').trim(),
-                             method, txn, invId]);
+        var names = (data.GroupMemberNames||'').split(' | ');
+        var phones= (data.GroupMemNumB   ||'').split(' | ');
+        var acts  = (data.MemberActivities||'').split(' | ');
+        names.forEach(function(n,i){
+          if (!n||n==='-') return;
+          sheet.appendRow([date, n.trim(), (phones[i]||'').trim(), '',
+                           'Group Member', regType, coupon, disc, ref, '0',
+                           (acts[i]||'Canvas Painting').trim(), method, txn, invId]);
         });
       }
 
-      // Insert all rows before summary
-      if (insertBefore > 0) {
-        sheet.insertRowsBefore(insertBefore, rowsToInsert.length);
-        sheet.getRange(insertBefore, 1, rowsToInsert.length, rowsToInsert[0].length).setValues(rowsToInsert);
-      } else {
-        rowsToInsert.forEach(function(row) { sheet.appendRow(row); });
-      }
+      // Update Summary tab
+      updateSummaryTab();
 
-      // Telegram text
+      // Telegram notification
       var msg = '🎨 <b>New RangDe Registration!</b>\n\n'
-        + '👤 <b>Name:</b> '      + (data.Name         || '-') + '\n'
-        + '📞 <b>Phone:</b> '     + (data.Phone        || '-') + '\n'
-        + '📧 <b>Email:</b> '     + (data.Email        || '-') + '\n'
-        + '🎫 <b>Type:</b> '      + (data.Type         || '-') + '\n'
-        + '👥 <b>Members:</b> '   + (data.Members      || 1)   + '\n';
+        + '👤 <b>Name:</b> '       + (data.Name          ||'-') + '\n'
+        + '📞 <b>Phone:</b> '      + (data.Phone         ||'-') + '\n'
+        + '📧 <b>Email:</b> '      + (data.Email         ||'-') + '\n'
+        + '🎫 <b>Type:</b> '       + (data.Type          ||'-') + '\n'
+        + '👥 <b>Members:</b> '    + (data.Members       ||1)   + '\n';
 
-      // Add group member details if group registration
-      if (data.Type === 'Group' && data.GroupMemberNames && data.GroupMemberNames !== '-') {
-        var names  = (data.GroupMemberNames || '').split(' | ');
-        var phones = (data.GroupMemNumB     || '').split(' | ');
-        var acts   = (data.MemberActivities || '').split(' | ');
-        msg += '\n👥 <b>Group Members:</b>\n';
-        names.forEach(function(n, i) {
-          msg += '  ' + (i+2) + '. ' + n
-            + (phones[i] ? ' — ' + phones[i] : '')
-            + (acts[i]   ? ' (' + acts[i] + ')' : '') + '\n';
+      if (data.Type==='Group'&&data.GroupMemberNames&&data.GroupMemberNames!=='-') {
+        var ns=(data.GroupMemberNames||'').split(' | ');
+        var ps=(data.GroupMemNumB||'').split(' | ');
+        var as=(data.MemberActivities||'').split(' | ');
+        msg+='\n👥 <b>Group Members:</b>\n';
+        ns.forEach(function(n,i){
+          msg+='  '+(i+2)+'. '+n+(ps[i]?' — '+ps[i]:'')+(as[i]?' ('+as[i]+')':'')+'\n';
         });
-        msg += '\n';
+        msg+='\n';
       }
 
-      msg += '🏷 <b>Coupon:</b> '    + (data.CouponUsed   || '-') + '\n'
-        + '� <b>Referred by:</b> '+ (data.ReferredBy   || '-') + '\n'
-        + '�💸 <b>Discount:</b> '  + (data.Discount     || '0%')+ '\n'
-        + '💰 <b>Total Paid:</b> '+ (data.TotalPaid    || '-') + '\n'
-        + '🎨 <b>Activity:</b> '  + (data.Activity     || '-') + '\n'
-        + '💳 <b>Payment:</b> '   + (data.PaymentMethod|| '-') + '\n'
-        + '🔖 <b>Txn ID:</b> '    + (data.TransactionID|| '-') + '\n'
-        + '🎟 <b>Invoice ID:</b> '+ (data.InvoiceID    || '-') + '\n'
-        + '🕐 <b>Date:</b> '      + (data.Date         || '-') + '\n\n'
-        + '⏳ Payment screenshot will follow...';
+      msg += '🏷 <b>Coupon:</b> '     + (data.CouponUsed   ||'-') + '\n'
+           + '📣 <b>Referred by:</b> '+ (data.ReferredBy   ||'-') + '\n'
+           + '💸 <b>Discount:</b> '   + (data.Discount     ||'0%')+ '\n'
+           + '💰 <b>Total Paid:</b> ' + (data.TotalPaid    ||'-') + '\n'
+           + '🎨 <b>Activity:</b> '   + (data.Activity     ||'-') + '\n'
+           + '💳 <b>Payment:</b> '    + (data.PaymentMethod||'-') + '\n'
+           + '🔖 <b>Txn ID:</b> '     + (data.TransactionID||'-') + '\n'
+           + '🎟 <b>Invoice ID:</b> ' + (data.InvoiceID    ||'-') + '\n'
+           + '🕐 <b>Date:</b> '       + (data.Date         ||'-') + '\n\n'
+           + '⏳ Payment screenshot will follow...';
       sendTelegram(msg);
 
-      // Refresh summary at bottom of sheet
-      updateSheetSummary(sheet);
-
-      return ContentService
-        .createTextOutput(JSON.stringify({status:'ok'}))
+      return ContentService.createTextOutput(JSON.stringify({status:'ok'}))
         .setMimeType(ContentService.MimeType.JSON);
     } catch(err) {
-      return ContentService
-        .createTextOutput(JSON.stringify({status:'error', msg: err.toString()}))
+      return ContentService.createTextOutput(JSON.stringify({status:'error',msg:err.toString()}))
         .setMimeType(ContentService.MimeType.JSON);
     }
   }
 
-  // 2. Admin fetch all rows
+  // Admin fetch
   if (e.parameter.u !== ADMIN_USER || e.parameter.p !== ADMIN_PASS) {
-    return ContentService
-      .createTextOutput(JSON.stringify({status:'unauthorized'}))
+    return ContentService.createTextOutput(JSON.stringify({status:'unauthorized'}))
       .setMimeType(ContentService.MimeType.JSON);
   }
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_NAME);
   var rows  = sheet.getDataRange().getValues();
-  if (rows.length < 2) {
-    return ContentService
-      .createTextOutput(JSON.stringify({status:'ok', rows:[]}))
-      .setMimeType(ContentService.MimeType.JSON);
-  }
+  if (rows.length < 2) return ContentService.createTextOutput(JSON.stringify({status:'ok',rows:[]}))
+    .setMimeType(ContentService.MimeType.JSON);
   var headers = rows[0];
-  var data = rows.slice(1).map(function(r) {
-    var o = {}; headers.forEach(function(h,i){ o[h] = r[i]; }); return o;
+  var data = rows.slice(1).map(function(r){
+    var o={}; headers.forEach(function(h,i){o[h]=r[i];}); return o;
   });
-  return ContentService
-    .createTextOutput(JSON.stringify({status:'ok', rows:data}))
+  return ContentService.createTextOutput(JSON.stringify({status:'ok',rows:data}))
     .setMimeType(ContentService.MimeType.JSON);
 }
 
-// ── doPost: receives payment screenshot + sends to Telegram ──────────
+// ── doPost: payment screenshot → Telegram + Drive ────────────────────
 function doPost(e) {
   try {
     var params = e.parameter;
-
-    // Payment screenshot upload
     if (params.action === 'uploadScreenshot') {
       var base64   = params.base64Data || '';
       var mimeType = params.mimeType   || 'image/jpeg';
@@ -217,61 +188,29 @@ function doPost(e) {
       var amount   = params.amount     || '-';
       var invId    = params.invoiceId  || '-';
       var phone    = params.phone      || '-';
-
-      if (!base64) {
-        return ContentService
-          .createTextOutput(JSON.stringify({status:'error', msg:'No image data'}))
-          .setMimeType(ContentService.MimeType.JSON);
-      }
-
-      // Decode and create blob
+      if (!base64) return ContentService.createTextOutput(JSON.stringify({status:'error',msg:'No image data'}))
+        .setMimeType(ContentService.MimeType.JSON);
       var decoded  = Utilities.base64Decode(base64);
       var ext      = mimeType.split('/')[1] || 'jpg';
-      var fileName = name.replace(/\s+/g,'_') + '_' + txn + '.' + ext;
-      var blob     = Utilities.newBlob(decoded, mimeType, fileName);
-
-      // Save to Drive
-      var folder = getPaymentFolder();
-      var file   = folder.createFile(blob);
+      var blob     = Utilities.newBlob(decoded, mimeType, name.replace(/\s+/g,'_')+'_'+txn+'.'+ext);
+      var file     = getPaymentFolder().createFile(blob);
       file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
-
-      // Send photo to Telegram with caption
-      var caption = '💳 Payment Screenshot\n\n'
-        + '👤 ' + name   + '\n'
-        + '📞 ' + phone  + '\n'
-        + '💰 ' + amount + '\n'
-        + '🔖 Txn: ' + txn + '\n'
-        + '🎟 Invoice: ' + invId;
-
-      // Send the blob as photo to Telegram
-      sendTelegramPhoto(blob.copyBlob(), caption);
-
-      return ContentService
-        .createTextOutput(JSON.stringify({status:'ok', fileId: file.getId()}))
+      sendTelegramPhoto(blob.copyBlob(),
+        '💳 Payment Screenshot\n\n👤 '+name+'\n📞 '+phone+'\n💰 '+amount+'\n🔖 Txn: '+txn+'\n🎟 Invoice: '+invId);
+      return ContentService.createTextOutput(JSON.stringify({status:'ok',fileId:file.getId()}))
         .setMimeType(ContentService.MimeType.JSON);
     }
-
-    // Fallback: plain registration row via POST
     var data;
-    try { data = JSON.parse(e.postData.contents); }
-    catch(x) { data = JSON.parse(params.data); }
-
+    try { data=JSON.parse(e.postData.contents); } catch(x) { data=JSON.parse(params.data); }
     var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_NAME);
-    if (sheet.getLastRow() === 0) {
-      sheet.appendRow(['Date','Name','Email','Phone','Type','Members',
-                       'Groc']);
-    }
-    var cols = ['Date','Name','Email','Phone','Type','Members',
-                'GroupMemberNames','GroupMemNumB','CouponUsed','Discount',
-                'TotalPaid','PaymentMethod','TransactionID','InvoiceID'];
-    sheet.appendRow(cols.map(function(h){ return data[h] || ''; }));
-
-    return ContentService
-      .createTextOutput(JSON.stringify({status:'ok'}))
+    sheet.appendRow([data.Date||'',data.Name||'',data.Phone||'',data.Email||'','Individual',
+                     data.Type||'',data.CouponUsed||'-',data.Discount||'0%',data.ReferredBy||'-',
+                     data.TotalPaid||'-',data.Activity||'-',data.PaymentMethod||'-',
+                     data.TransactionID||'-',data.InvoiceID||'']);
+    return ContentService.createTextOutput(JSON.stringify({status:'ok'}))
       .setMimeType(ContentService.MimeType.JSON);
   } catch(err) {
-    return ContentService
-      .createTextOutput(JSON.stringify({status:'error', msg: err.toString()}))
+    return ContentService.createTextOutput(JSON.stringify({status:'error',msg:err.toString()}))
       .setMimeType(ContentService.MimeType.JSON);
   }
 }
