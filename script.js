@@ -13,6 +13,7 @@ const COUPONS = {
   'NADIA25':    25,    // 25% off
   'FATIMA25':   25,    // 25% off
   'SAIMA20':    20,    // 20% off
+  'SAIMA30':    30,    // 30% off
 };
 const BASE_PRICE = 1800;
 
