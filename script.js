@@ -516,13 +516,15 @@ function saveAndConfirm() {
       method, txn, date, memberNames, memberPhones,
       discountPct: state.discountPct,
       firstInvoiceId,
+      activity: state.activity,
     };
     renderInvoices(invoiceData);
   } else {
-    // No sheet URL — just render invoices normally
     const invoiceData = {
       name, phone, email, coupon, regType, members, total,
       method, txn, date, memberNames, memberPhones,
+      discountPct: state.discountPct,
+      activity: state.activity,
       discountPct: state.discountPct,
     };
     renderInvoices(invoiceData);
@@ -602,6 +604,7 @@ function renderInvoices(data) {
       + '</div>'
       + '<div class="inv-rows">'
       + '<div class="inv-row"><div class="ilabel">Workshop</div><div class="ival">Canvas + Trinket Tray</div></div>'
+      + '<div class="inv-row"><div class="ilabel">My Activity</div><div class="ival">' + (data.activity === 'canvas' ? '🎨 Canvas Painting' : data.activity === 'trinket' ? '🪆 Trinket Tray' : 'Canvas + Trinket Tray') + '</div></div>'
       + '<div class="inv-row"><div class="ilabel">Date</div><div class="ival">Mon, 20 July 2025</div></div>'
       + '<div class="inv-row"><div class="ilabel">Time</div><div class="ival">2:00 PM &ndash; 5:00 PM</div></div>'
       + '<div class="inv-row"><div class="ilabel">Venue</div><div class="ival">Mr. COD, University Town</div></div>'
