@@ -538,3 +538,13 @@ h3{font-size:clamp(1.1rem,3vw,1.5rem);}
   .activity-card{padding:12px 8px 10px;}
   .activity-card img{max-height:90px;}
 }
+
+/* ===== MEMBER ROW ACTIVITY ===== */
+.gmrow { flex-wrap: wrap; gap: 6px; }
+.mactivity { display:flex; gap:4px; align-items:center; }
+.tbtn-sm {
+  padding: 5px 10px !important;
+  font-size: .8rem !important;
+  min-width: 0 !important;
+  border-radius: 50px !important;
+}

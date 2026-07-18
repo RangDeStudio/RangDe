@@ -134,6 +134,7 @@ function validateStep(n) {
     if (!phone) { alert('Please enter your phone number.'); return false; }
     if (phone.replace(/\D/g,'').length !== 11) { alert('Phone number must be exactly 11 digits.'); return false; }
     if (!email || !email.includes('@')) { alert('Please enter a valid email address.'); return false; }
+    if (!state.activity) { alert('Please choose your activity — Canvas Painting or Trinket Tray.'); return false; }
     if (state.type === 'group' || state.type === 'duo') {
       const rows = document.querySelectorAll('#grpList .gmrow');
       const visibleRows = Array.from(rows).filter(r => r.style.display !== 'none');
@@ -164,7 +165,6 @@ function validateStep(n) {
       const ref = document.getElementById('referredBy').value.trim();
       if (!ref) { alert('Please enter who referred this coupon to you.'); return false; }
     }
-    if (!state.activity) { alert('Please choose your activity — Canvas Painting or Trinket Tray.'); return false; }
   }
   return true;
 }
@@ -244,6 +244,10 @@ function addMember() {
   row.innerHTML = '<span class="gnum"></span>'
     + '<input type="text" class="minput mname" placeholder="Member name *">'
     + '<input type="tel" class="minput mphone" placeholder="Phone (11 digits) *" maxlength="11">'
+    + '<div class="mactivity">'
+    + '<button type="button" class="tbtn tbtn-sm mact-canvas active" onclick="setMemberActivity(this,\'canvas\')">&#127912;</button>'
+    + '<button type="button" class="tbtn tbtn-sm mact-trinket" onclick="setMemberActivity(this,\'trinket\')">&#129695;</button>'
+    + '</div>'
     + '<button type="button" class="remove-member" onclick="removeMember(this)">&#10005;</button>';
   list.appendChild(row);
   renumberMembers();
@@ -373,6 +377,12 @@ function selectActivity(activity) {
     upsell.innerHTML = '&#127912; <strong>Want to also do Canvas Painting?</strong> You can add it on the spot for just <strong>Rs. 500</strong> extra!';
   }
 }
+
+function setMemberActivity(btn, activity) {
+  const row = btn.closest('.gmrow');
+  row.querySelector('.mact-canvas').classList.toggle('active', activity === 'canvas');
+  row.querySelector('.mact-trinket').classList.toggle('active', activity === 'trinket');
+}
 function selectPM(method) {
   state.paymentMethod = method;
   document.getElementById('payInstr').style.display = 'block';
@@ -455,6 +465,11 @@ function saveAndConfirm() {
     return p ? p.value.trim() : '';
   }).filter(Boolean);
 
+  const memberActivities = Array.from(memberRows).map(row => {
+    const isCanvas = row.querySelector('.mact-canvas');
+    return isCanvas && isCanvas.classList.contains('active') ? 'canvas' : 'trinket';
+  });
+
   const row = {
     Date: date,
     Name: name,
@@ -517,6 +532,7 @@ function saveAndConfirm() {
       discountPct: state.discountPct,
       firstInvoiceId,
       activity: state.activity,
+      memberActivities,
     };
     renderInvoices(invoiceData);
   } else {
@@ -574,6 +590,11 @@ function renderInvoices(data) {
 
   attendees.forEach(function(attendee, idx) {
     const invId = idx === 0 && data.firstInvoiceId ? data.firstInvoiceId : generateInvoiceId();
+    // idx 0 = main person, idx 1+ = members
+    const thisActivity = idx === 0
+      ? (data.activity || 'canvas')
+      : (data.memberActivities && data.memberActivities[idx - 1]) || 'canvas';
+    const activityLabel = thisActivity === 'trinket' ? '&#129695; Trinket Tray' : '&#127912; Canvas Painting';
     const perPersonAmt = data.regType === 'Group'
       ? formatRs(Math.round(BASE_PRICE * (1 - data.discountPct / 100)))
       : (data.total === 0 ? '\uD83C\uDF89 FREE' : formatRs(data.total));
@@ -604,7 +625,7 @@ function renderInvoices(data) {
       + '</div>'
       + '<div class="inv-rows">'
       + '<div class="inv-row"><div class="ilabel">Workshop</div><div class="ival">Canvas + Trinket Tray</div></div>'
-      + '<div class="inv-row"><div class="ilabel">My Activity</div><div class="ival">' + (data.activity === 'canvas' ? '🎨 Canvas Painting' : data.activity === 'trinket' ? '🪆 Trinket Tray' : 'Canvas + Trinket Tray') + '</div></div>'
+      + '<div class="inv-row"><div class="ilabel">My Activity</div><div class="ival">' + activityLabel + '</div></div>'
       + '<div class="inv-row"><div class="ilabel">Date</div><div class="ival">Mon, 20 July 2025</div></div>'
       + '<div class="inv-row"><div class="ilabel">Time</div><div class="ival">2:00 PM &ndash; 5:00 PM</div></div>'
       + '<div class="inv-row"><div class="ilabel">Venue</div><div class="ival">Mr. COD, University Town</div></div>'
