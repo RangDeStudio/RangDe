@@ -33,6 +33,34 @@ function sendTelegramPhoto(blob, caption) {
   } catch(e) {}
 }
 
+// ── SHEET SUMMARY ─────────────────────────────────────────────────────
+function updateSheetSummary(sheet) {
+  try {
+    var lastRow = sheet.getLastRow();
+    // Remove old summary
+    for (var r = lastRow; r >= 1; r--) {
+      var val = sheet.getRange(r, 1).getValue();
+      if (val === '--- SUMMARY ---') {
+        sheet.deleteRows(r, lastRow - r + 1);
+        lastRow = r - 1;
+        break;
+      }
+    }
+    var dataRange = 'K2:K' + lastRow;
+    sheet.appendRow(['']);
+    sheet.appendRow(['--- SUMMARY ---']);
+    sheet.appendRow(['Activity', 'Count']);
+    sheet.appendRow(['Canvas Painting', '=COUNTIF(' + dataRange + ',"Canvas Painting")']);
+    sheet.appendRow(['Trinket Tray',    '=COUNTIF(' + dataRange + ',"Trinket Tray")']);
+    sheet.appendRow(['Not Selected',    '=COUNTIF(' + dataRange + ',"-")']);
+    sheet.appendRow(['']);
+    sheet.appendRow(['Total Registrations', '=COUNTA(B2:B' + lastRow + ')']);
+    sheet.appendRow(['Total Revenue',       '=SUMPRODUCT((ISNUMBER(FIND("Rs.",J2:J' + lastRow + ')))*IFERROR(VALUE(SUBSTITUTE(SUBSTITUTE(J2:J' + lastRow + ',"Rs. ",""),",","")),0))']);
+    var summRow = sheet.getLastRow() - 7;
+    sheet.getRange(summRow, 1).setFontWeight('bold').setBackground('#ca3027').setFontColor('#ffffff');
+  } catch(e) {}
+}
+
 // ── Google Drive folder for payment screenshots ───────────────────────
 function getPaymentFolder() {
   var name = 'RangDe_PaymentScreenshots';
@@ -65,12 +93,15 @@ function doGet(e) {
       var regType = data.Type || 'Individual';
       var activity = data.Activity || '-';
 
+      var isFree   = (total + '').toUpperCase().includes('FREE');
+      var leadAmt  = isFree ? '0' : total;
+
       // Main registrant row
       sheet.appendRow([date, data.Name||'', data.Phone||'', data.Email||'',
                        regType === 'Individual' ? 'Individual' : 'Group Lead',
-                       regType, coupon, disc, ref, total, activity, method, txn, invId]);
+                       regType, coupon, disc, ref, leadAmt, activity, method, txn, invId]);
 
-      // Group/Duo member rows
+      // Group/Duo member rows — amount is 0
       if (data.GroupMemberNames && data.GroupMemberNames !== '-') {
         var names     = (data.GroupMemberNames || '').split(' | ');
         var phones    = (data.GroupMemNumB     || '').split(' | ');
@@ -79,7 +110,7 @@ function doGet(e) {
           if (!n || n === '-') return;
           sheet.appendRow([date, n.trim(), (phones[i]||'').trim(), '',
                            'Group Member', regType, coupon, disc, ref,
-                           total, (acts[i]||'Canvas Painting').trim(),
+                           '0', (acts[i]||'Canvas Painting').trim(),
                            method, txn, invId]);
         });
       }
@@ -117,6 +148,9 @@ function doGet(e) {
         + '🕐 <b>Date:</b> '      + (data.Date         || '-') + '\n\n'
         + '⏳ Payment screenshot will follow...';
       sendTelegram(msg);
+
+      // Refresh summary at bottom of sheet
+      updateSheetSummary(sheet);
 
       return ContentService
         .createTextOutput(JSON.stringify({status:'ok'}))
