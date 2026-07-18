@@ -429,7 +429,7 @@ if (uploadArea) {
 // ── SUBMIT ────────────────────────────────────────────────────────────
 // ── GOOGLE SHEETS ENDPOINT ───────────────────────────────────────────
 // Paste your Google Apps Script Web App URL here after deploying
-const SHEET_URL = 'https://script.google.com/macros/s/AKfycbyipzbwnwkGgpp7xoyFkGuaX0l23BkZ8JpfmsJn7pNOFSb8qxdVF8v96uc50mjgif07/exec';
+const SHEET_URL = 'https://script.google.com/macros/s/AKfycbxJP1CpRLq5I2b4AtyfSW_fUtWhx7uOkT-oLJxXsGqS4VVqLYCkQfKSNhRy18Qo3RnA/exec';
 
 // ── SUBMIT ────────────────────────────────────────────────────────────
 function submitReg() {
