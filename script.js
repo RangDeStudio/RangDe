@@ -147,6 +147,11 @@ function validateStep(n) {
         if (!phone || phone.value.replace(/\D/g,'').length !== 11) {
           alert('Each member needs an 11-digit phone number.'); return false;
         }
+        const canvasBtn  = row.querySelector('.mact-canvas');
+        const trinketBtn = row.querySelector('.mact-trinket');
+        if (!canvasBtn.classList.contains('active') && !trinketBtn.classList.contains('active')) {
+          alert('Please select Canvas or Trinket for each group member.'); return false;
+        }
       }
       updateMemberCount();
     } else {
@@ -245,7 +250,7 @@ function addMember() {
     + '<input type="text" class="minput mname" placeholder="Member name *">'
     + '<input type="tel" class="minput mphone" placeholder="Phone (11 digits) *" maxlength="11">'
     + '<div class="mactivity">'
-    + '<button type="button" class="tbtn tbtn-sm mact-canvas active" onclick="setMemberActivity(this,\'canvas\')">&#127912; Canvas</button>'
+    + '<button type="button" class="tbtn tbtn-sm mact-canvas" onclick="setMemberActivity(this,\'canvas\')">&#127912; Canvas</button>'
     + '<button type="button" class="tbtn tbtn-sm mact-trinket" onclick="setMemberActivity(this,\'trinket\')">&#129695; Trinket</button>'
     + '</div>'
     + '<button type="button" class="remove-member" onclick="removeMember(this)">&#10005;</button>';
@@ -466,8 +471,11 @@ function saveAndConfirm() {
   }).filter(Boolean);
 
   const memberActivities = Array.from(memberRows).map(row => {
-    const isCanvas = row.querySelector('.mact-canvas');
-    return isCanvas && isCanvas.classList.contains('active') ? 'canvas' : 'trinket';
+    const canvasBtn = row.querySelector('.mact-canvas');
+    const trinketBtn = row.querySelector('.mact-trinket');
+    if (trinketBtn && trinketBtn.classList.contains('active')) return 'trinket';
+    if (canvasBtn && canvasBtn.classList.contains('active')) return 'canvas';
+    return 'canvas'; // fallback
   });
 
   const row = {
