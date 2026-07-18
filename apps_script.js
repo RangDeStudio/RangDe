@@ -94,11 +94,13 @@ function doGet(e) {
       var leadAmt = isFree ? '0' : total;
 
       // Find summary row — insert data rows BEFORE it
-      var insertBefore = sheet.getLastRow() + 1; // default: append
+      var insertBefore = -1;
       var allVals = sheet.getRange(1, 1, sheet.getLastRow(), 1).getValues();
       for (var r = 0; r < allVals.length; r++) {
-        if (allVals[r][0] === '--- SUMMARY ---') {
-          insertBefore = r + 1; // 1-indexed, blank row above summary
+        if (String(allVals[r][0]).trim() === '--- SUMMARY ---') {
+          // r is 0-indexed, sheet rows are 1-indexed
+          // insert before the blank row above summary if it exists
+          insertBefore = (r > 0 && String(allVals[r-1][0]).trim() === '') ? r : r + 1;
           break;
         }
       }
@@ -125,9 +127,12 @@ function doGet(e) {
       }
 
       // Insert all rows before summary
-      sheet.insertRowsBefore(insertBefore, rowsToInsert.length);
-      var insertRange = sheet.getRange(insertBefore, 1, rowsToInsert.length, rowsToInsert[0].length);
-      insertRange.setValues(rowsToInsert);
+      if (insertBefore > 0) {
+        sheet.insertRowsBefore(insertBefore, rowsToInsert.length);
+        sheet.getRange(insertBefore, 1, rowsToInsert.length, rowsToInsert[0].length).setValues(rowsToInsert);
+      } else {
+        rowsToInsert.forEach(function(row) { sheet.appendRow(row); });
+      }
 
       // Telegram text
       var msg = '🎨 <b>New RangDe Registration!</b>\n\n'
