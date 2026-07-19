@@ -250,7 +250,7 @@ function addMember() {
     + '<input type="tel" class="minput mphone" placeholder="Phone (11 digits) *" maxlength="11">'
     + '<div class="mactivity">'
     + '<button type="button" class="tbtn tbtn-sm mact-canvas" onclick="setMemberActivity(this,\'canvas\')">&#127912; Canvas</button>'
-    + '<button type="button" class="tbtn tbtn-sm mact-trinket tbtn-soldout" disabled>&#129695; Trinket</button>'
+    + '<button type="button" class="tbtn tbtn-sm mact-trinket" onclick="setMemberActivity(this,\'trinket\')">&#129695; Trinket</button>'
     + '</div>'
     + '<button type="button" class="remove-member" onclick="removeMember(this)">&#10005;</button>';
   list.appendChild(row);
