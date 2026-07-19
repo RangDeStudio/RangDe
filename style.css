@@ -548,3 +548,15 @@ h3{font-size:clamp(1.1rem,3vw,1.5rem);}
   min-width: 0 !important;
   border-radius: 50px !important;
 }
+
+/* ===== SOLD OUT BUTTON ===== */
+.tbtn-soldout {
+  opacity: 0.45;
+  cursor: not-allowed !important;
+  text-decoration: line-through;
+  color: #aaa !important;
+  background: #f0f0f0 !important;
+  border-color: #ddd !important;
+  pointer-events: none;
+}
+.tbtn-soldout:hover { opacity: 0.45; transform: none !important; box-shadow: none !important; }
