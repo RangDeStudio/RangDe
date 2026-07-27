@@ -16,6 +16,7 @@ const COUPONS = {
   'RABIART20':  20,    // 20% off
 };
 const BASE_PRICE = 1800;
+const KID_PRICE  = 1200;
 
 // ── STATE ────────────────────────────────────────────────────────────
 let state = {
@@ -186,6 +187,7 @@ function setType(t) {
   }
 
   document.getElementById('btnInd').classList.toggle('active', t === 'individual');
+  document.getElementById('btnKid').classList.toggle('active', t === 'kid');
   document.getElementById('btnDuo').classList.toggle('active', t === 'duo');
   document.getElementById('btnGrp').classList.toggle('active', t === 'group');
 
@@ -194,9 +196,20 @@ function setType(t) {
   const addBtn     = document.getElementById('addMemberBtn');
   const grpHint    = document.getElementById('grpHint');
 
-  if (t === 'duo') {
-    state.discountPct = 25;
+  if (t === 'kid') {
+    state.discountPct = 0;
+    state.members = 1;
+    state.kidPrice = true;
+    lockCoupon(false);
+    document.getElementById('couponFg').style.display = 'block';
+    document.getElementById('grpCouponBlock').style.display = 'none';
+    grpSection.style.display = 'none';
+    if (grpRow3) grpRow3.style.display = '';
+    if (addBtn)  addBtn.style.display  = '';
+  } else if (t === 'duo') {
+    state.discountPct = 15;
     state.members = 2;
+    state.kidPrice = false;
     lockCoupon(true);
     document.getElementById('couponFg').style.display = 'none';
     document.getElementById('grpCouponBlock').style.display = 'flex';
@@ -204,25 +217,27 @@ function setType(t) {
     // Show only 1 member row, hide 3rd row and add button
     if (grpRow3) grpRow3.style.display = 'none';
     if (addBtn)  addBtn.style.display  = 'none';
-    if (grpHint) grpHint.innerHTML = 'Enter your partner\'s details &#8212; <strong>25% duo discount</strong> applies!';
+    if (grpHint) grpHint.innerHTML = 'Enter your partner\'s details &#8212; <strong>15% duo discount</strong> applies!';
     document.getElementById('grpCouponBlock').querySelector('p').innerHTML =
-      'Coupon codes cannot be used with duo discount. Your <strong>25% duo discount</strong> is already applied!';
-    document.getElementById('grpNoticeText').innerHTML = 'Duo discount of <strong>25%</strong> applied automatically!';
+      'Coupon codes cannot be used with duo discount. Your <strong>15% duo discount</strong> is already applied!';
+    document.getElementById('grpNoticeText').innerHTML = 'Duo discount of <strong>15%</strong> applied automatically!';
   } else if (t === 'group') {
-    state.discountPct = 50;
+    state.discountPct = 40;
+    state.kidPrice = false;
     lockCoupon(true);
     document.getElementById('couponFg').style.display = 'none';
     document.getElementById('grpCouponBlock').style.display = 'flex';
     grpSection.style.display = 'block';
     if (grpRow3) grpRow3.style.display = '';
     if (addBtn)  addBtn.style.display  = '';
-    if (grpHint) grpHint.innerHTML = 'Minimum 3 people &#8212; <strong>50% group discount</strong> applies!';
+    if (grpHint) grpHint.innerHTML = 'Minimum 3 people &#8212; <strong>40% group discount</strong> applies!';
     document.getElementById('grpCouponBlock').querySelector('p').innerHTML =
-      'Coupon codes cannot be used with group discount. Your <strong>50% group discount</strong> is already applied!';
-    document.getElementById('grpNoticeText').innerHTML = 'Group discount of <strong>50%</strong> applied automatically!';
+      'Coupon codes cannot be used with group discount. Your <strong>40% group discount</strong> is already applied!';
+    document.getElementById('grpNoticeText').innerHTML = 'Group discount of <strong>40%</strong> applied automatically!';
   } else {
     state.discountPct = 0;
     state.members = 1;
+    state.kidPrice = false;
     lockCoupon(false);
     document.getElementById('couponFg').style.display = 'block';
     document.getElementById('grpCouponBlock').style.display = 'none';
@@ -330,7 +345,8 @@ function clearCouponMsg() {
 
 // ── PRICE CALCULATION ─────────────────────────────────────────────────
 function finalTotal() {
-  const base = BASE_PRICE * state.members;
+  const price = state.kidPrice ? KID_PRICE : BASE_PRICE;
+  const base = price * state.members;
   const discount = Math.round(base * state.discountPct / 100);
   return base - discount;
 }
@@ -340,12 +356,13 @@ function formatRs(n) {
 }
 
 function updatePriceSummary() {
-  const base = BASE_PRICE * state.members;
+  const price = state.kidPrice ? KID_PRICE : BASE_PRICE;
+  const base = price * state.members;
   const discount = Math.round(base * state.discountPct / 100);
   const total = base - discount;
 
   document.getElementById('baseP').textContent =
-    formatRs(BASE_PRICE) + (state.members > 1 ? ' x ' + state.members + ' = ' + formatRs(base) : '');
+    formatRs(price) + (state.members > 1 ? ' x ' + state.members + ' = ' + formatRs(base) : '');
   document.getElementById('totalP').textContent = total === 0 ? '🎉 FREE' : formatRs(total);
 
   const discRow = document.getElementById('discRow');
@@ -632,11 +649,11 @@ function renderInvoices(data) {
       + '</div>'
       + '</div>'
       + '<div class="inv-rows">'
-      + '<div class="inv-row"><div class="ilabel">Workshop</div><div class="ival">Canvas + Trinket Tray</div></div>'
+      + '<div class="inv-row"><div class="ilabel">Workshop</div><div class="ival">Paint &amp; Yap &mdash; Tote Bag Painting</div></div>'
       + '<div class="inv-row"><div class="ilabel">My Activity</div><div class="ival">' + activityLabel + '</div></div>'
-      + '<div class="inv-row"><div class="ilabel">Date</div><div class="ival">Mon, 20 July 2025</div></div>'
-      + '<div class="inv-row"><div class="ilabel">Time</div><div class="ival">2:00 PM &ndash; 5:00 PM</div></div>'
-      + '<div class="inv-row"><div class="ilabel">Venue</div><div class="ival">Mr. COD, University Town</div></div>'
+      + '<div class="inv-row"><div class="ilabel">Date</div><div class="ival">Mon, 3 Aug 2025</div></div>'
+      + '<div class="inv-row"><div class="ilabel">Time</div><div class="ival">TBA</div></div>'
+      + '<div class="inv-row"><div class="ilabel">Venue</div><div class="ival">Cafe Crunch, Peshawar</div></div>'
       + (data.coupon ? '<div class="inv-row"><div class="ilabel">Coupon</div><div class="ival" style="color:var(--red)">' + data.coupon + ' (' + data.discountPct + '% off)</div></div>' : '')
       + (data.txn !== 'N/A' ? '<div class="inv-row"><div class="ilabel">Txn ID</div><div class="ival">' + data.txn + '</div></div>' : '')
       + '</div>'
