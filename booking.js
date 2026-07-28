@@ -527,7 +527,7 @@ function rdBuildInvoices(name, phone, email, txn, total, invId) {
         <div class="inv-row"><div class="ilabel">Event</div><div class="ival">Paint &amp; Yap Ep.2</div></div>
         <div class="inv-row"><div class="ilabel">Activity</div><div class="ival">${actName}</div></div>
         <div class="inv-row"><div class="ilabel">Date</div><div class="ival">Mon, 3 Aug 2025</div></div>
-        <div class="inv-row"><div class="ilabel">Venue</div><div class="ival">Cafe Crunch, Peshawar</div></div>
+        <div class="inv-row"><div class="ilabel">Venue</div><div class="ival">Nook Cafe, Peshawar</div></div>
         ${txn!=='N/A'?'<div class="inv-row"><div class="ilabel">Txn ID</div><div class="ival">'+txn+'</div></div>':''}
       </div>
       <div class="inv-total-row"><span class="itl">Amount</span><span class="itv">${perAmt}</span></div>
