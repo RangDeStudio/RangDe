@@ -1,5 +1,21 @@
 // ── RANG DE BOOKING FORM ─────────────────────────────────────────────
 const RD_PRICES = { tote: 2000, ceramic: 1400, addon: 300 };
+
+// ── Sheet-friendly labels (must match the Summary formulas in Code.gs) ──
+const RD_ACT_LABEL   = { tote: 'Tote Bag Painting', ceramic: 'Ceramic Toys + Mini Canvas' };
+const RD_FOOD_LABEL  = { deal: 'Deal (Burger+Fries+Drink)', menu: '15% Off Menu' };
+const RD_DRINK_LABEL = { freshlime: 'Fresh Lime', soda: 'Soda', margarita: 'Margarita' };
+
+// Price for one participant, before any discount
+function rdPPrice(p) {
+  return (p.activity === 'tote' ? RD_PRICES.tote : RD_PRICES.ceramic)
+       + (p.addon ? RD_PRICES.addon : 0);
+}
+// Full activity text written to the sheet
+function rdActFull(p) {
+  return (RD_ACT_LABEL[p.activity] || '-') + (p.addon ? ' + Extra Ceramic Magnet' : '');
+}
+
 const RD_COUPONS = {
   'FRIENDS10':10,'BLOGGERS25':25,'BLOGGER50':50,'BUSH25':25,'FRIEND50':50,
   'RANGDE75':75,'ROYAAM25':25,'SABAOON25':25,'NADIA25':25,'FATIMA25':25,
@@ -287,23 +303,13 @@ function rdSetDrink(idx, drink) {
 }
 
 // ── SUMMARY ────────────────────────────────────────────────────────────
-function rdTotal() {
-  let sub = 0;
-  rdState.participants.forEach(p => {
-    const base = p.activity === 'tote' ? RD_PRICES.tote : RD_PRICES.ceramic;
-    sub += base + (p.addon ? RD_PRICES.addon : 0);
-  });
-  const discount = Math.round(sub * rdState.discountPct / 100);
-  return sub - discount;
+function rdSubtotal() {
+  return rdState.participants.reduce((s, p) => s + rdPPrice(p), 0);
 }
 
-function rdSubtotal() {
-  let sub = 0;
-  rdState.participants.forEach(p => {
-    const base = p.activity === 'tote' ? RD_PRICES.tote : RD_PRICES.ceramic;
-    sub += base + (p.addon ? RD_PRICES.addon : 0);
-  });
-  return sub;
+function rdTotal() {
+  const sub = rdSubtotal();
+  return sub - Math.round(sub * rdState.discountPct / 100);
 }
 
 function rdBuildSummary() {
@@ -314,18 +320,19 @@ function rdBuildSummary() {
   const card = document.createElement('div');
   card.className = 'rd-summary-card';
   rdState.participants.forEach((p, i) => {
-    const base = p.activity === 'tote' ? RD_PRICES.tote : RD_PRICES.ceramic;
-    const total = base + (p.addon ? RD_PRICES.addon : 0);
-    const actName = p.activity === 'tote' ? '&#127912; Tote Bag Painting' : '&#129522; Ceramic Toy + Mini Canvas';
-    const foodLabel = { burger:'&#127828; Burger', freshlime:'&#127819; Fresh Lime', margarita:'&#127381; Margarita', soda:'&#127863; Soda' };
-    const foodStr = p.food ? ' + ' + (foodLabel[p.food] || p.food) : '';
+    const total = rdPPrice(p);
+    const actName = p.activity === 'tote' ? '&#127912; Tote Bag Painting' : '&#129522; Ceramic Toys + Mini Canvas';
+    const foodStr = p.food === 'deal'
+      ? '&#127828; Deal (Burger + Fries + Drink)' + (p.drink ? ' &middot; ' + (RD_DRINK_LABEL[p.drink] || '') : '')
+      : p.food === 'menu' ? '&#127974; 15% Off Menu' : '';
     const row = document.createElement('div');
     row.className = 'rd-summary-row';
     row.innerHTML = `
       <div class="rd-sum-num">${i+1}</div>
       <div class="rd-sum-info">
         <div class="rd-sum-name">${p.name || 'Participant '+(i+1)} <span style="font-size:.75rem;opacity:.6;">(${p.age})</span></div>
-        <div class="rd-sum-details">${actName}${p.addon?' + Extra Mini Canvas':''}</div>
+        <div class="rd-sum-details">${actName}${p.addon?' + Extra Ceramic Magnet':''}</div>
+        <div class="rd-sum-details" style="opacity:.75;">${foodStr}</div>
       </div>
       <div class="rd-sum-price">PKR ${total.toLocaleString()}</div>
     `;
@@ -419,24 +426,32 @@ function rdSubmit() {
   const date  = new Date().toLocaleString('en-PK', { timeZone: 'Asia/Karachi' });
   const total = rdTotal();
 
-  const memberNames  = rdState.participants.map(p => p.name).join(' | ') || '-';
-  const memberPhones = rdState.participants.map(p => p.phone || '-').join(' | ') || '-';
-  const memberActivities = rdState.participants.map(p => (p.activity==='tote'?'Tote Bag Painting':'Ceramic Toy + Mini Canvas') + (p.addon?' + Extra Canvas':'')).join(' | ');
-
   const invId = rdGenerateInvId();
+  rdState.invoiceIds = rdState.participants.map((p, i) => i === 0 ? invId : rdGenerateInvId());
+
+  // One object per person — Code.gs writes one sheet row for each
+  const participants = rdState.participants.map((p, i) => ({
+    name:      p.name || '',
+    phone:     p.phone || '',
+    age:       p.age === 'kid' ? 'Kid' : 'Adult',
+    activity:  rdActFull(p),
+    price:     rdPPrice(p),
+    food:      RD_FOOD_LABEL[p.food] || '-',
+    drink:     p.food === 'deal' ? (RD_DRINK_LABEL[p.drink] || '-') : '',
+    invoiceId: rdState.invoiceIds[i],
+  }));
 
   const row = {
     Date: date, Name: name, Email: email, Phone: phone,
     Type: rdState.count > 1 ? 'Group' : 'Individual',
     Members: rdState.count,
-    GroupMemberNames: memberNames,
-    GroupMemNumB: memberPhones,
+    Participants: JSON.stringify(participants),
     CouponUsed: rdState.coupon || '-',
     Discount: rdState.discountPct + '%',
     ReferredBy: rdState.referredBy || '-',
     TotalPaid: total === 0 ? 'FREE' : 'Rs. ' + total,
-    Activity: rdState.participants[0] ? (rdState.participants[0].activity==='tote'?'Tote Bag Painting':'Ceramic Toy + Mini Canvas') : '-',
-    MemberActivities: memberActivities,
+    TotalPaidNum: total,
+    Activity: participants[0] ? participants[0].activity : '-',
     PaymentMethod: total === 0 ? 'N/A (Free)' : 'easypaisa',
     TransactionID: txn,
     InvoiceID: invId,
@@ -503,9 +518,12 @@ function rdBuildInvoices(name, phone, email, txn, total, invId) {
   wrap.appendChild(heading);
 
   rdState.participants.forEach((p, idx) => {
-    const thisInvId = idx === 0 ? invId : rdGenerateInvId();
+    const thisInvId = (rdState.invoiceIds && rdState.invoiceIds[idx]) || rdGenerateInvId();
     const perAmt = idx === 0 ? (total > 0 ? 'PKR ' + total.toLocaleString() : '🎉 FREE') : 'Included';
-    const actName = p.activity === 'tote' ? '🎨 Tote Bag Painting' : '🧸 Ceramic Toy + Mini Canvas';
+    const actName = (p.activity === 'tote' ? '🎨 ' : '🧸 ') + rdActFull(p);
+    const foodName = p.food === 'deal'
+      ? '🍔 Deal' + (p.drink ? ' · ' + (RD_DRINK_LABEL[p.drink] || '') : '')
+      : p.food === 'menu' ? '🏪 15% Off Menu' : '-';
     const card = document.createElement('div');
     card.className = 'invoice-card';
     card.id = 'rdinv-' + idx;
@@ -526,6 +544,7 @@ function rdBuildInvoices(name, phone, email, txn, total, invId) {
       <div class="inv-rows">
         <div class="inv-row"><div class="ilabel">Event</div><div class="ival">Paint &amp; Yap Ep.2</div></div>
         <div class="inv-row"><div class="ilabel">Activity</div><div class="ival">${actName}</div></div>
+        <div class="inv-row"><div class="ilabel">Refreshment</div><div class="ival">${foodName}</div></div>
         <div class="inv-row"><div class="ilabel">Date</div><div class="ival">Mon, 3 Aug 2025</div></div>
         <div class="inv-row"><div class="ilabel">Venue</div><div class="ival">Nook Cafe, Peshawar</div></div>
         ${txn!=='N/A'?'<div class="inv-row"><div class="ilabel">Txn ID</div><div class="ival">'+txn+'</div></div>':''}
