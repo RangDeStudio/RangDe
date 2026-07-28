@@ -129,7 +129,8 @@ tr:hover td{background:rgba(253,190,109,.07);}
       <thead>
         <tr>
           <th>#</th><th>Date</th><th>Name</th><th>Email</th><th>Phone</th>
-          <th>Type</th><th>People</th><th>Member Names</th><th>Member Phones</th>
+          <th>Role</th><th>Type</th><th>Age</th><th>Activity</th><th>Price</th>
+          <th>Food</th><th>Drink</th>
           <th>Coupon</th><th>Discount</th><th>Total Paid</th>
           <th>Payment</th><th>Txn ID</th>
         </tr>
@@ -141,7 +142,7 @@ tr:hover td{background:rgba(253,190,109,.07);}
 
 <script>
 // ── CONFIG — paste your Google Apps Script URL here ────────────────
-const SHEET_URL   = 'https://script.google.com/macros/s/AKfycbxJP1CpRLq5I2b4AtyfSW_fUtWhx7uOkT-oLJxXsGqS4VVqLYCkQfKSNhRy18Qo3RnA/exec';
+const SHEET_URL   = 'https://script.google.com/macros/s/AKfycbyIKWFmq6sbPxVBrZeNat1j6-5SohhXZIU_FrrvCzg-aF-dUweqEqk2oUGZVb7mO2aOxQ/exec';
 const ADMIN_EMAIL = 'admin@rangde.com';
 const ADMIN_PASS  = 'rangde2025';
 const CSV_KEY     = 'rangde_registrations';
@@ -265,10 +266,13 @@ function renderTable() {
       <td><strong>${r.Name||'-'}</strong></td>
       <td style="font-size:.82rem">${r.Email||'-'}</td>
       <td>${r.Phone||'-'}</td>
+      <td style="font-size:.78rem">${r.Role||'-'}</td>
       <td><span class="badge ${r.Type==='Group'?'badge-grp':'badge-ind'}">${r.Type||'-'}</span></td>
-      <td style="text-align:center;font-weight:800">${r.Members||1}</td>
-      <td style="font-size:.78rem;color:#7a4a3a;max-width:140px">${r.GroupMemberNames||'-'}</td>
-      <td style="font-size:.78rem;color:#7a4a3a;max-width:140px">${r.GroupMemNumB||'-'}</td>
+      <td style="text-align:center">${r.Age||'-'}</td>
+      <td style="font-size:.78rem;color:#7a4a3a;max-width:160px">${r.Activity||'-'}</td>
+      <td style="font-size:.8rem;white-space:nowrap">${r.ActivityPrice||'-'}</td>
+      <td style="font-size:.78rem">${r.FoodOption||'-'}</td>
+      <td style="font-size:.78rem">${r.Drink||'-'}</td>
       <td><strong style="color:#ca3027">${r.CouponUsed||'-'}</strong></td>
       <td style="font-weight:700">${r.Discount||'0%'}</td>
       <td><span class="badge ${String(r.TotalPaid).toUpperCase().includes('FREE')?'badge-free':'badge-paid'}">${r.TotalPaid||'-'}</span></td>
@@ -280,9 +284,9 @@ function renderTable() {
 // ── CSV EXPORT ─────────────────────────────────────────────────────
 function downloadCSV() {
   if (!allRecords.length) { alert('No data to export.'); return; }
-  const headers = ['Date','Name','Email','Phone','Type','Members',
-                   'GroupMemberNames','GroupMemNumB','CouponUsed','Discount',
-                   'TotalPaid','PaymentMethod','TransactionID'];
+  const headers = ['Date','Name','Email','Phone','Role','Type','Age','Activity',
+                   'ActivityPrice','FoodOption','Drink','Discount','CouponUsed',
+                   'ReferredBy','TotalPaid','PaymentMethod','TransactionID','InvoiceID'];
   const csv = [
     headers.join(','),
     ...allRecords.map(r =>
