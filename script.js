@@ -1,4 +1,4 @@
-﻿// ── COUPON CODES ─────────────────────────────────────────────────────
+// ── COUPON CODES ─────────────────────────────────────────────────────
 // code → discount percentage
 const COUPONS = {
   'FRIENDS10':  10,    // 10% off — friends
@@ -450,7 +450,7 @@ if (uploadArea) {
 // ── SUBMIT ────────────────────────────────────────────────────────────
 // ── GOOGLE SHEETS ENDPOINT ───────────────────────────────────────────
 // Paste your Google Apps Script Web App URL here after deploying
-const SHEET_URL = 'https://script.google.com/macros/s/AKfycbxJP1CpRLq5I2b4AtyfSW_fUtWhx7uOkT-oLJxXsGqS4VVqLYCkQfKSNhRy18Qo3RnA/exec';
+const SHEET_URL = 'https://script.google.com/macros/s/AKfycbyIKWFmq6sbPxVBrZeNat1j6-5SohhXZIU_FrrvCzg-aF-dUweqEqk2oUGZVb7mO2aOxQ/exec';
 
 // ── SUBMIT ────────────────────────────────────────────────────────────
 function submitReg() {
