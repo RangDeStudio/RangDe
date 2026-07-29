@@ -117,7 +117,7 @@ function rdSetCount(n) {
   rdState.participants = rdState.participants.slice(0, n);
   // Auto discount — only if no coupon applied
   if (!rdState.coupon) {
-    if (n === 2) rdState.discountPct = 15;
+    if (n === 2) rdState.discountPct = 10;
     else if (n >= 3) rdState.discountPct = 15;
     else rdState.discountPct = 0;
   }
@@ -170,7 +170,7 @@ function rdAddParticipant() {
   rdState.participants.push({ name:'', phone:'', age:'adult', activity:'', addon:false, food:'' });
   rdState.count = rdState.participants.length;
   if (!rdState.coupon) {
-    if (rdState.count === 2) rdState.discountPct = 15;
+    if (rdState.count === 2) rdState.discountPct = 10;
     else if (rdState.count >= 3) rdState.discountPct = 15;
   }
   rdBuildParticipants();
@@ -186,7 +186,7 @@ function rdRemoveParticipant(idx) {
   rdState.count = rdState.participants.length;
   if (!rdState.coupon) {
     if (rdState.count === 1) rdState.discountPct = 0;
-    else if (rdState.count === 2) rdState.discountPct = 15;
+    else if (rdState.count === 2) rdState.discountPct = 10;
     else rdState.discountPct = 15;
   }
   rdBuildParticipants();
@@ -209,7 +209,7 @@ function rdUpdateDiscountNotice() {
   const notice = document.getElementById('rdDiscountNotice');
   let msg = '';
   if (!rdState.coupon) {
-    if (rdState.count === 2) msg = '&#128145; Duo discount: <strong>15% off</strong> applied automatically!';
+    if (rdState.count === 2) msg = '&#128145; Group discount: <strong>10% off</strong> applied automatically!';
     else if (rdState.count >= 3) msg = '&#128111; Group discount: <strong>15% off</strong> applied automatically!';
   } else {
     msg = '&#10003; Coupon <strong>' + rdState.coupon + '</strong> (' + rdState.discountPct + '% off) applied!';
@@ -346,7 +346,7 @@ function rdBuildSummary() {
     const disc = Math.round(sub * rdState.discountPct / 100);
     const dl = document.createElement('div');
     dl.className = 'rd-discount-line';
-    let label = rdState.coupon ? `Coupon ${rdState.coupon}` : rdState.count === 2 ? 'Duo Discount' : 'Group Discount';
+    let label = rdState.coupon ? `Coupon ${rdState.coupon}` : 'Group Discount';
     dl.innerHTML = `<span>${label} (${rdState.discountPct}% off)</span><span>-PKR ${disc.toLocaleString()}</span>`;
     wrap.appendChild(dl);
   }
@@ -408,7 +408,7 @@ function rdApplyCoupon() {
     document.getElementById('rdReferredFg').style.display = 'block';
   } else {
     rdState.coupon = '';
-    rdState.discountPct = (rdState.count === 2 ? 15 : rdState.count >= 3 ? 15 : 0);
+    rdState.discountPct = (rdState.count === 2 ? 10 : rdState.count >= 3 ? 15 : 0);
     msg.textContent = 'Invalid coupon. Please try again.';
     msg.className = 'rd-coupon-msg err';
     document.getElementById('rdReferredFg').style.display = 'none';
