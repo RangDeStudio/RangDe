@@ -117,8 +117,8 @@ function rdSetCount(n) {
   rdState.participants = rdState.participants.slice(0, n);
   // Auto discount — only if no coupon applied
   if (!rdState.coupon) {
-    if (n === 2) rdState.discountPct = 10;
-    else if (n >= 3) rdState.discountPct = 15;
+    if (n === 2) rdState.discountPct = 15;
+    else if (n >= 3) rdState.discountPct = 30;
     else rdState.discountPct = 0;
   }
   rdBuildParticipants();
@@ -170,8 +170,8 @@ function rdAddParticipant() {
   rdState.participants.push({ name:'', phone:'', age:'adult', activity:'', addon:false, food:'' });
   rdState.count = rdState.participants.length;
   if (!rdState.coupon) {
-    if (rdState.count === 2) rdState.discountPct = 10;
-    else if (rdState.count >= 3) rdState.discountPct = 15;
+    if (rdState.count === 2) rdState.discountPct = 15;
+    else if (rdState.count >= 3) rdState.discountPct = 30;
   }
   rdBuildParticipants();
   // Sync count buttons
@@ -186,8 +186,8 @@ function rdRemoveParticipant(idx) {
   rdState.count = rdState.participants.length;
   if (!rdState.coupon) {
     if (rdState.count === 1) rdState.discountPct = 0;
-    else if (rdState.count === 2) rdState.discountPct = 10;
-    else rdState.discountPct = 15;
+    else if (rdState.count === 2) rdState.discountPct = 15;
+    else rdState.discountPct = 30;
   }
   rdBuildParticipants();
   document.querySelectorAll('.rd-count-btn').forEach((b, i) => {
@@ -209,8 +209,8 @@ function rdUpdateDiscountNotice() {
   const notice = document.getElementById('rdDiscountNotice');
   let msg = '';
   if (!rdState.coupon) {
-    if (rdState.count === 2) msg = '&#128145; Group discount: <strong>10% off</strong> applied automatically!';
-    else if (rdState.count >= 3) msg = '&#128111; Group discount: <strong>15% off</strong> applied automatically!';
+    if (rdState.count === 2) msg = '&#128145; Duo discount: <strong>15% off</strong> applied automatically!';
+    else if (rdState.count >= 3) msg = '&#128111; Group discount: <strong>30% off</strong> applied automatically!';
   } else {
     msg = '&#10003; Coupon <strong>' + rdState.coupon + '</strong> (' + rdState.discountPct + '% off) applied!';
   }
@@ -250,11 +250,11 @@ function rdBuildActivityCards() {
         </div>
       </div>
       <div class="rd-food-section">
-        <div class="rd-food-label">&#127828; Refreshment Choice <span class="rd-food-required">*</span></div>
+        <div class="rd-food-label">&#127828; Free Refreshment Choice <span class="rd-food-required">*</span></div>
         <div class="rd-food-cards">
           <div class="rd-food-card ${p.food==='deal'?'selected':''}" onclick="rdSetFood(${i},'deal')">
             <div class="rd-food-emoji">&#127828;</div>
-            <div class="rd-food-title">Deal</div>
+            <div class="rd-food-title">Free Deal</div>
             <div class="rd-food-desc">Burger + Fries + Drink</div>
           </div>
           <div class="rd-food-card ${p.food==='menu'?'selected':''}" onclick="rdSetFood(${i},'menu')">
@@ -323,7 +323,7 @@ function rdBuildSummary() {
     const total = rdPPrice(p);
     const actName = p.activity === 'tote' ? '&#127912; Tote Bag Painting' : '&#129522; Ceramic Toys + Mini Canvas';
     const foodStr = p.food === 'deal'
-      ? '&#127828; Deal (Burger + Fries + Drink)' + (p.drink ? ' &middot; ' + (RD_DRINK_LABEL[p.drink] || '') : '')
+      ? '&#127828; Free Deal (Burger + Fries + Drink)' + (p.drink ? ' &middot; ' + (RD_DRINK_LABEL[p.drink] || '') : '')
       : p.food === 'menu' ? '&#127974; 15% Off Menu' : '';
     const row = document.createElement('div');
     row.className = 'rd-summary-row';
@@ -346,7 +346,7 @@ function rdBuildSummary() {
     const disc = Math.round(sub * rdState.discountPct / 100);
     const dl = document.createElement('div');
     dl.className = 'rd-discount-line';
-    let label = rdState.coupon ? `Coupon ${rdState.coupon}` : 'Group Discount';
+    let label = rdState.coupon ? `Coupon ${rdState.coupon}` : rdState.count === 2 ? 'Duo Discount' : 'Group Discount';
     dl.innerHTML = `<span>${label} (${rdState.discountPct}% off)</span><span>-PKR ${disc.toLocaleString()}</span>`;
     wrap.appendChild(dl);
   }
@@ -408,7 +408,7 @@ function rdApplyCoupon() {
     document.getElementById('rdReferredFg').style.display = 'block';
   } else {
     rdState.coupon = '';
-    rdState.discountPct = (rdState.count === 2 ? 10 : rdState.count >= 3 ? 15 : 0);
+    rdState.discountPct = (rdState.count === 2 ? 15 : rdState.count >= 3 ? 30 : 0);
     msg.textContent = 'Invalid coupon. Please try again.';
     msg.className = 'rd-coupon-msg err';
     document.getElementById('rdReferredFg').style.display = 'none';
@@ -522,7 +522,7 @@ function rdBuildInvoices(name, phone, email, txn, total, invId) {
     const perAmt = idx === 0 ? (total > 0 ? 'PKR ' + total.toLocaleString() : '🎉 FREE') : 'Included';
     const actName = (p.activity === 'tote' ? '🎨 ' : '🧸 ') + rdActFull(p);
     const foodName = p.food === 'deal'
-      ? '🍔 Deal' + (p.drink ? ' · ' + (RD_DRINK_LABEL[p.drink] || '') : '')
+      ? '🍔 Free Deal' + (p.drink ? ' · ' + (RD_DRINK_LABEL[p.drink] || '') : '')
       : p.food === 'menu' ? '🏪 15% Off Menu' : '-';
     const card = document.createElement('div');
     card.className = 'invoice-card';
