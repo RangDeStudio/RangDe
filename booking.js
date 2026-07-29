@@ -118,7 +118,7 @@ function rdSetCount(n) {
   // Auto discount — only if no coupon applied
   if (!rdState.coupon) {
     if (n === 2) rdState.discountPct = 15;
-    else if (n >= 3) rdState.discountPct = 30;
+    else if (n >= 3) rdState.discountPct = 15;
     else rdState.discountPct = 0;
   }
   rdBuildParticipants();
@@ -171,7 +171,7 @@ function rdAddParticipant() {
   rdState.count = rdState.participants.length;
   if (!rdState.coupon) {
     if (rdState.count === 2) rdState.discountPct = 15;
-    else if (rdState.count >= 3) rdState.discountPct = 30;
+    else if (rdState.count >= 3) rdState.discountPct = 15;
   }
   rdBuildParticipants();
   // Sync count buttons
@@ -187,7 +187,7 @@ function rdRemoveParticipant(idx) {
   if (!rdState.coupon) {
     if (rdState.count === 1) rdState.discountPct = 0;
     else if (rdState.count === 2) rdState.discountPct = 15;
-    else rdState.discountPct = 30;
+    else rdState.discountPct = 15;
   }
   rdBuildParticipants();
   document.querySelectorAll('.rd-count-btn').forEach((b, i) => {
@@ -210,7 +210,7 @@ function rdUpdateDiscountNotice() {
   let msg = '';
   if (!rdState.coupon) {
     if (rdState.count === 2) msg = '&#128145; Duo discount: <strong>15% off</strong> applied automatically!';
-    else if (rdState.count >= 3) msg = '&#128111; Group discount: <strong>30% off</strong> applied automatically!';
+    else if (rdState.count >= 3) msg = '&#128111; Group discount: <strong>15% off</strong> applied automatically!';
   } else {
     msg = '&#10003; Coupon <strong>' + rdState.coupon + '</strong> (' + rdState.discountPct + '% off) applied!';
   }
@@ -408,7 +408,7 @@ function rdApplyCoupon() {
     document.getElementById('rdReferredFg').style.display = 'block';
   } else {
     rdState.coupon = '';
-    rdState.discountPct = (rdState.count === 2 ? 15 : rdState.count >= 3 ? 30 : 0);
+    rdState.discountPct = (rdState.count === 2 ? 15 : rdState.count >= 3 ? 15 : 0);
     msg.textContent = 'Invalid coupon. Please try again.';
     msg.className = 'rd-coupon-msg err';
     document.getElementById('rdReferredFg').style.display = 'none';
