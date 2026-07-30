@@ -17,9 +17,7 @@ function rdActFull(p) {
 }
 
 const RD_COUPONS = {
-  'FRIENDS10':10,'BLOGGERS25':25,'BLOGGER50':50,'BUSH25':25,'FRIEND50':50,
-  'RANGDE75':75,'ROYAAM25':25,'SABAOON25':25,'NADIA25':25,'FATIMA25':25,
-  'SAIMA20':20,'SAIMA30':30,'RABIART20':20
+  'RANGDE5':5,'RANGDE10':10,'RANGDE15':15
 };
 
 let rdState = {
@@ -115,12 +113,6 @@ function rdSetCount(n) {
   // Adjust participants array
   while (rdState.participants.length < n) rdState.participants.push({ name:'', phone:'', age:'adult', activity:'', addon:false, food:'' });
   rdState.participants = rdState.participants.slice(0, n);
-  // Auto discount — only if no coupon applied
-  if (!rdState.coupon) {
-    if (n === 2) rdState.discountPct = 15;
-    else if (n >= 3) rdState.discountPct = 30;
-    else rdState.discountPct = 0;
-  }
   rdBuildParticipants();
   rdUpdateDiscountNotice();
 }
@@ -169,10 +161,6 @@ function rdSetAge(idx, age) {
 function rdAddParticipant() {
   rdState.participants.push({ name:'', phone:'', age:'adult', activity:'', addon:false, food:'' });
   rdState.count = rdState.participants.length;
-  if (!rdState.coupon) {
-    if (rdState.count === 2) rdState.discountPct = 15;
-    else if (rdState.count >= 3) rdState.discountPct = 30;
-  }
   rdBuildParticipants();
   // Sync count buttons
   document.querySelectorAll('.rd-count-btn').forEach((b, i) => {
@@ -184,11 +172,6 @@ function rdRemoveParticipant(idx) {
   if (rdState.count <= 1) return;
   rdState.participants.splice(idx, 1);
   rdState.count = rdState.participants.length;
-  if (!rdState.coupon) {
-    if (rdState.count === 1) rdState.discountPct = 0;
-    else if (rdState.count === 2) rdState.discountPct = 15;
-    else rdState.discountPct = 30;
-  }
   rdBuildParticipants();
   document.querySelectorAll('.rd-count-btn').forEach((b, i) => {
     b.classList.toggle('active', i + 1 === rdState.count);
@@ -208,10 +191,7 @@ function rdSaveParticipants() {
 function rdUpdateDiscountNotice() {
   const notice = document.getElementById('rdDiscountNotice');
   let msg = '';
-  if (!rdState.coupon) {
-    if (rdState.count === 2) msg = '&#128145; Duo discount: <strong>15% off</strong> applied automatically!';
-    else if (rdState.count >= 3) msg = '&#128111; Group discount: <strong>30% off</strong> applied automatically!';
-  } else {
+  if (rdState.coupon) {
     msg = '&#10003; Coupon <strong>' + rdState.coupon + '</strong> (' + rdState.discountPct + '% off) applied!';
   }
   if (msg) { notice.innerHTML = msg; notice.style.display = 'block'; }
@@ -346,7 +326,7 @@ function rdBuildSummary() {
     const disc = Math.round(sub * rdState.discountPct / 100);
     const dl = document.createElement('div');
     dl.className = 'rd-discount-line';
-    let label = rdState.coupon ? `Coupon ${rdState.coupon}` : rdState.count === 2 ? 'Duo Discount' : 'Group Discount';
+    let label = `Coupon ${rdState.coupon}`;
     dl.innerHTML = `<span>${label} (${rdState.discountPct}% off)</span><span>-PKR ${disc.toLocaleString()}</span>`;
     wrap.appendChild(dl);
   }
@@ -408,11 +388,12 @@ function rdApplyCoupon() {
     document.getElementById('rdReferredFg').style.display = 'block';
   } else {
     rdState.coupon = '';
-    rdState.discountPct = (rdState.count === 2 ? 15 : rdState.count >= 3 ? 30 : 0);
+    rdState.discountPct = 0;
     msg.textContent = 'Invalid coupon. Please try again.';
     msg.className = 'rd-coupon-msg err';
     document.getElementById('rdReferredFg').style.display = 'none';
   }
+  rdUpdateDiscountNotice();
 }
 
 // ── SUBMIT ─────────────────────────────────────────────────────────────
