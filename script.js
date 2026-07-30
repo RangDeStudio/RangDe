@@ -1,19 +1,9 @@
 // ── COUPON CODES ─────────────────────────────────────────────────────
 // code → discount percentage
 const COUPONS = {
-  'FRIENDS10':  10,    // 10% off — friends
-  'BLOGGERS25': 25,    // 25% off — bloggers
-  'BLOGGER50':  50,    // 50% off — bloggers
-  'BUSH25':     25,    // 25% off
-  'FRIEND50':   50,    // 50% off — friends
-  'RANGDE75':   75,    // 75% off
-  'ROYAAM25':   25,    // 25% off
-  'SABAOON25':  25,    // 25% off
-  'NADIA25':    25,    // 25% off
-  'FATIMA25':   25,    // 25% off
-  'SAIMA20':    20,    // 20% off
-  'SAIMA30':    30,    // 30% off
-  'RABIART20':  20,    // 20% off
+  'RANGDE5':  5,     // 5% off
+  'RANGDE10': 10,    // 10% off
+  'RANGDE15': 15,    // 15% off
 };
 const BASE_PRICE = 1800;
 const KID_PRICE  = 1200;
@@ -207,33 +197,27 @@ function setType(t) {
     if (grpRow3) grpRow3.style.display = '';
     if (addBtn)  addBtn.style.display  = '';
   } else if (t === 'duo') {
-    state.discountPct = 15;
+    state.discountPct = 0;
     state.members = 2;
     state.kidPrice = false;
-    lockCoupon(true);
-    document.getElementById('couponFg').style.display = 'none';
-    document.getElementById('grpCouponBlock').style.display = 'flex';
+    lockCoupon(false);
+    document.getElementById('couponFg').style.display = 'block';
+    document.getElementById('grpCouponBlock').style.display = 'none';
     grpSection.style.display = 'block';
     // Show only 1 member row, hide 3rd row and add button
     if (grpRow3) grpRow3.style.display = 'none';
     if (addBtn)  addBtn.style.display  = 'none';
-    if (grpHint) grpHint.innerHTML = 'Enter your partner\'s details &#8212; <strong>15% duo discount</strong> applies!';
-    document.getElementById('grpCouponBlock').querySelector('p').innerHTML =
-      'Coupon codes cannot be used with duo discount. Your <strong>15% duo discount</strong> is already applied!';
-    document.getElementById('grpNoticeText').innerHTML = 'Duo discount of <strong>15%</strong> applied automatically!';
+    if (grpHint) grpHint.innerHTML = 'Enter your partner\'s details. Have a coupon? Enter it below.';
   } else if (t === 'group') {
-    state.discountPct = 40;
+    state.discountPct = 0;
     state.kidPrice = false;
-    lockCoupon(true);
-    document.getElementById('couponFg').style.display = 'none';
-    document.getElementById('grpCouponBlock').style.display = 'flex';
+    lockCoupon(false);
+    document.getElementById('couponFg').style.display = 'block';
+    document.getElementById('grpCouponBlock').style.display = 'none';
     grpSection.style.display = 'block';
     if (grpRow3) grpRow3.style.display = '';
     if (addBtn)  addBtn.style.display  = '';
-    if (grpHint) grpHint.innerHTML = 'Minimum 3 people &#8212; <strong>40% group discount</strong> applies!';
-    document.getElementById('grpCouponBlock').querySelector('p').innerHTML =
-      'Coupon codes cannot be used with group discount. Your <strong>40% group discount</strong> is already applied!';
-    document.getElementById('grpNoticeText').innerHTML = 'Group discount of <strong>40%</strong> applied automatically!';
+    if (grpHint) grpHint.innerHTML = 'Minimum 3 people. Have a coupon? Enter it below.';
   } else {
     state.discountPct = 0;
     state.members = 1;
@@ -305,10 +289,6 @@ function updateMemberCount() {
 
 // ── COUPON ────────────────────────────────────────────────────────────
 function applyCoupon() {
-  if (state.type === 'group') {
-    showCouponMsg('Group discount (50%) already applied — coupon cannot be combined.', 'err');
-    return;
-  }
   const code = document.getElementById('coupon').value.trim().toUpperCase();
   if (!code) { showCouponMsg('Please enter a coupon code.', 'err'); return; }
 
@@ -368,12 +348,7 @@ function updatePriceSummary() {
   const discRow = document.getElementById('discRow');
   if (state.discountPct > 0) {
     discRow.style.display = 'flex';
-    document.getElementById('discLabel').textContent =
-      state.type === 'group'
-        ? 'Group discount (50%)'
-        : state.type === 'duo'
-        ? 'Duo discount (25%)'
-        : `Coupon discount (${state.discountPct}%)`;
+    document.getElementById('discLabel').textContent = `Coupon discount (${state.discountPct}%)`;
     document.getElementById('discAmt').textContent = '- ' + formatRs(discount);
   } else {
     discRow.style.display = 'none';
