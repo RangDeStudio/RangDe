@@ -4,7 +4,7 @@ const RD_PRICES = { tote: 2000, ceramic: 1400, addon: 300 };
 // ── Sheet-friendly labels (must match the Summary formulas in Code.gs) ──
 const RD_ACT_LABEL   = { tote: 'Tote Bag Painting', ceramic: 'Ceramic Toys + Mini Canvas' };
 const RD_FOOD_LABEL  = { deal: 'Deal (Burger+Fries+Drink)', menu: '15% Off Menu' };
-const RD_DRINK_LABEL = { freshlime: 'Fresh Lime', soda: 'Soda', margarita: 'Margarita' };
+const RD_DRINK_LABEL = { freshlime: 'Fresh Lime', soda: 'Soda' };
 
 // Price for one participant, before any discount
 function rdPPrice(p) {
@@ -249,7 +249,6 @@ function rdBuildActivityCards() {
           <div class="rd-drink-pills">
             <button type="button" class="rd-drink-pill ${p.drink==='freshlime'?'active':''}" onclick="rdSetDrink(${i},'freshlime')">&#127819; Fresh Lime</button>
             <button type="button" class="rd-drink-pill ${p.drink==='soda'?'active':''}" onclick="rdSetDrink(${i},'soda')">&#129482; Soda (Pepsi/Sprite)</button>
-            <button type="button" class="rd-drink-pill ${p.drink==='margarita'?'active':''}" onclick="rdSetDrink(${i},'margarita')">&#127381; Margarita</button>
           </div>
         </div>` : ''}
       </div>
