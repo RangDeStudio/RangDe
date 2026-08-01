@@ -235,11 +235,11 @@ function rdBuildActivityCards() {
           <div class="rd-food-card ${p.food==='deal'?'selected':''}" onclick="rdSetFood(${i},'deal')">
             <div class="rd-food-emoji">&#127828;</div>
             <div class="rd-food-title">Free Deal</div>
-            <div class="rd-food-desc">Burger + Fries + Drink</div>
+            <div class="rd-food-desc">Standard Crispy Chicken Burger</div>
           </div>
           <div class="rd-food-card ${p.food==='menu'?'selected':''}" onclick="rdSetFood(${i},'menu')">
             <div class="rd-food-emoji">&#127974;</div>
-            <div class="rd-food-title">Or Enjoy 15% Off Menu</div>
+            <div class="rd-food-title">Or Enjoy 15% Off On <b>Menu</b></div>
             <div class="rd-food-desc">Order anything and enjoy 15% on it</div>
           </div>
         </div>
